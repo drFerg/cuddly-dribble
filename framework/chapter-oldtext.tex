@@ -1,0 +1,128 @@
+\chapter{A Framework for Simulating Cyber-Physical Systems in the Virtual-World (15 )}
+% Describe what better CPS tools would provide - environmental simulation, trained environment models, virtual environments, cross-environment simulation
+Despite the growth in interest in the fields of sensor networks, cyber-physical computing and the Internet of Things, developing and testing sensor networks remains a difficult task, requiring developers to build reliable software which interacts as expected with the environment it inhabits.
+
+Testing and understanding how the environment interacts with a sensor network and vice-versa relies on placing the devices in the target environment and waiting for/creating the desired phenomena to interact with the network. Phenomena can include events such as movement of devices/objects, passive or active interaction with people (pressing buttons, triggering motion sensors), or other sensor events. Performing test deployments can be expensive, time-consuming and difficult.
+
+Existing tools and techniques aren't adequate for reliably and comprehensively testing these devices in the context of their target environment and the phenomena which may occur within it. Existing approaches for testing sensor networks have focused heavily on accurately simulating devices, the network and power consumption, with great success \cite{cooja, tossim}. However,  support for interacting with the environment is limited, typically performed using recorded or designed sensor trace data. This approach can be inaccurate, unrealistic and is restricted to what was recorded.
+
+In this chapter we present and evaluate a novel approach to this problem, integrating a freely available high-performance 3D video game engine (Unreal Engine 4) with an existing sensor network simulation platform (Cooja), creating an end-to-end simulation solution for realistic testing of sensor networks in their target environments. By integrating a 3D game engine, we are introducing sensor network simulations into virtual reality with a real-time and dynamic virtual world, utilising the game engine's realistic physics, lighting and artificially intelligent people and crowds to influence and test the deployed sensor network.
+
+
+\section{Requirements}
+\label{sub:Requirements}
+As part of the design we have defined a key set of requirements which we deem necessary for a framework to support simulating and testing in virtual environments reliably and accurately, such that developers benefit from using such a tool over just testing in the real world or in a sensor network simulator.
+
+\subsection{3D design and placement}
+\label{sub:3D design and placement}
+A key part of many sensor network projects is understanding how many and where to place devices within the environment to achieve some desired objective, such as coverage, reliability or detection accuracy. Using Ard\'{a}n developers are able to easily scale up or down the size of the network and move devices around the environment to test different configurations.
+
+\subsection{Time Control}
+\label{sub:Time Control}
+Unlike in real world deployments, developers have the power to control time in the simulated world. Developers can: stop-the-clock, freezing both the simulation and world in time, whilst giving them full control over what they see, allowing more time to observe the environment and move between points of interest; slow down time, giving developers more time to observe or control the simulation; or even speed up time, providing desired results in considerably less time.
+
+\subsection{Phenomena-on-demand}
+\label{sub:Phenomena-on-demand}
+In order to fully test sensor network applications in the real-world, developers often need to wait for or even force desired phenomena to occur and then observe how their system reacts. However, exercising control over the real-world can be a difficult and time-consuming challenge, and sometimes not possible (e.g., fire), due to health and safety concerns.
+
+Using Ard\'{a}n, developers can take direct control of a virtual person or script intelligent virtual crowds to carry out tasks, such as walking between points, avoidance, following or interacting with objects. Figure \ref{fig:views} shows people walking up and down a corridor, avoiding each other's path. Unlike using trace data, genuine or created, developers can easily tweak scenarios, such as moving sensors, people or adjusting behaviour, to test subtle or significant variations. Developers can also create scenarios that are difficult or dangerous to reproduce in the real world, such as emergency situations, and repeatedly test their applications without risk.
+
+\subsection{Visualisation (Visual Diffing, Analytics)}
+\label{sub:Visualisation}
+Ard\'{a}n provides developers tools to overlay visualisations of network and sensor meta-information on top of the virtual world to help understand how the network is running, allowing developers to see information such as how network paths form as packets are sent, as well as transmissions, receptions, interruptions. In figure \ref{fig:views}, sending devices are highlighted with a circle and receiving devices are connected by an arrow to the sender, each device is represented with its own colour, to help differentiate simultaneous transmissions.
+
+\subsection{Virtual Sensors and Actuators}
+\label{sub:Virtual Sensors and Actuators}
+Within Ard\'{a}n we have modeled several basic sensors and actuators, including motion detectors, buttons, lights and location. These act as virtual hardware for the simulated sensors, allowing the simulation to interact with the virtual world. Virtual sensors can be designed to model a real sensors behaviour, or be virtually improved, providing higher accuracy or more features, not possible with existing hardware.
+
+\subsection{Mobility} % (fold)
+\label{sub:mobility}
+Existing solutions either don't consider mobility or see it as pre-determined - don't react to real-time to new and changing environments.
+Our system allows agents to move and change paths in real-time based on environmental events.
+% subsection mobility (end)
+
+\subsection{Scalability} % (fold)
+\label{sub:scalability}
+
+% subsection scalability (end)
+
+\subsection{Extensibility} % (fold)
+\label{sub:extensibility}
+The system should be designed to allow for integration of new tools to supplement or replace the existing ones, leaving open the possibility to improve the co-simulation output and experience through the use of additional simulation tools, model checkers or real test-beds.
+
+% subsection extensibility (end)
+\textbf{Common Schema - }
+In order to ensure information communicated between individual sub-systems correspond, all information passed between the different tools must match or conform to a common schema, such as time, location and sensed units; without this conformity, even the simplest of interactions, such as device movement through a space, could be misunderstood between sub-systems, cm vs mm vs feet. This builds upon the extensibility requirement, ensuring future tools that support the schema will integrate seamlessly into the system.
+
+
+\textbf{Real application code - }
+Developers should only be required to write application code once, using the same code to run in both the virtual- and real-world environments. This significantly reduces the barrier to entry for use of the tool and eliminates the opportunity for translation bugs being introduced when transitioning between test and deployment environments.
+
+\textbf{Direct control - }
+The system should allow direct control of three key aspects of the simulation: entities in the world, such as environmental attributes and physical devices or sensors; virtual people in the 3D world, enabling the developer to inhabit the world vicariously through a virtual person, interacting and responding to the world as if it were the real world; lastly, the view, allowing the developer to view the world from any angle at any point in time, including pausing the world mid-simulation and moving around, providing a better view of a point of interest.
+
+
+\textbf{Time control - }
+Whilst observing an ongoing simulation the developer should be able to pause the ongoing simulation allowing them to view a snapshot in time in more detail, both in terms of the running application and the 3D world, before resuming, speeding up or stepping through the simulation. Full control would allow the developer to also rewind back to an earlier state in the simulation and 3D world, enabling the developer to replay a set of events and observe multiple points of interest from different angles.
+
+\textbf{Real-time operation - }
+The system should support real-time operation so that simulations not only finish in a timely manner but are also responsive to direct interaction by developers. In order for the sensor network simulator to run in real-time, the 3D game engine must respond to all requests in real-time (sensor reads), such that the virtual hardware is in-discernable from the real counterpart.
+
+\textbf{Synchronisation - }
+Synchronisation, between the WSN simulator and 3D game engine clocks, ensures time sensitive events which rely on a global notion of time and delays occur correctly. Whilst real-time operation is also a requirement for all sub-systems, due to the differing simulation methods which aren't 100\% accurate and the intricacies of OS level scheduling, synchronisation is necessary to ensure that the individual sub-system's clocks stay in sync, within reasonable bounds. Similarly, communications between the sub-systems must be of low enough latency such that no additional delays are introduced. Typical applications are designed with predictable or known delays, such as opening a door after a motion event.
+
+\textbf{Scripted control - }
+Automated test cases are an important tool for testing systems repeatedly, thus, to support this the tool should allow developers to create scripted scenarios, in which people and objects within the 3D world can be instructed to follow set actions based on events, be it time, key presses or world events.
+
+\textbf{Modular environment building - }
+Designing 3D environments from scratch can be a slow and difficult process for non-expert 3D designers such as developers. Thus, in order to enable fast set-up, the system must support re-use and modification of existing pre-built environments and provide modular building blocks for building environments e.g., walls, doors, rooms, sensors, lights, agents.
+
+
+
+\textbf{Test cases - }
+The system should provide support to observe and assert conditions about the whole distributed system and world, akin to unit-testing available in traditional application development. Assertions would provide developers with warnings about phenomena that can occur on a particular node, area, or within entire environment, such as ensuring a light's duty cycle doesn't exceed a set limit, checking a group of nodes are reporting similar information or checking for network partitions due to node movement.
+
+
+\section{Framework}
+\label{sec:Design}
+Ard\'{a}n itself is not a single component, but a collection of plugins for facilitating the communication and arbitration between different tools, shown in figure \ref{fig:architecture}. The individual tools act as peers, sharing information with each other to inform their individual simulations/operations, e.g., location updates sent from the 3D game engine to the simulator, affecting radio transmission.
+
+\subsection{Architecture} % (fold)
+\label{sub:architecture}
+
+% subsection architecture (end)
+\begin{figure}[ht]
+  \includesvg[svgpath = imgs/, width = 0.5\textwidth]{architecture}
+  \caption{Ard\'{a}n architecture}
+  \label{fig:architecture}
+\end{figure}
+
+While the goal of work is to build an improved simulation experience for testing sensor network applications by integrating a 3D game engine into the pipeline, we also want to create an architecture that can support future integration of other existing tools to further support and improve the field of sensor network application testing.
+
+Thus, rather than integrate the systems directly, our approach uses a network event bus and common schema to describe information passed between the different sub-systems. This approach reduces the tight coupling between components, allowing individual components to be swapped out or new ones added. We envision the use of tools such as model checking, statistical analysis, unit-testing and advanced simulation for radio and environmental properties.
+
+The WSN simulator (Cooja), performs all application and network simulation for the co-simulation and is configured with a set of nodes with their 3D location and application code to run. As the application code is run in real-time, any sensor- or actuator-based hardware requests, such as sensor reads and actuator commands, are forwarded to the 3D game engine to be performed in the virtual environment.
+
+Within the Unreal Engine we modeled a 3D environment and created a several components to support deploying virtual sensor networks, including device and sensor 3D models, hardware abstractions for the virtual sensors and actuators to sense the virtual world and report back to the simulator over the network bus. Similarly within the Cooja simulator we have modified the simulated hardware to communicate to our virtual hardware in the Unreal Engine.
+
+Using Cooja, developers are able to write code once and both test in Ard\'{a}n and deploy in the real-world on the Contiki or TinyOS platform, removing difficulties associated with translating between test and deployment platforms. Using the open architecture, support for additional tools and simulation platforms can also be added, expanding the possibilities and improving the fidelity of simulations.
+
+
+\subsection{Communication Model} % (fold)
+\label{sub:communication_model}
+
+\subsection{CPS Simulation} % (fold)
+\label{sub:cps_simulation}
+
+% subsection cps_simulation (end)
+
+\subsection{Game Engine - Environment Simulation} % (fold)
+\label{sub:environment_simulation}
+
+% subsection environment_simulation (end)
+% subsection communication_model (end)
+
+\subsection{Time} % (fold)
+\label{sub:time}
+
+% subsection time (end)

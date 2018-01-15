@@ -1,0 +1,48 @@
+\chapter{Case Study}
+\label{chap:Case Study}
+\section{Introduction}
+\label{sec:Introduction}
+Describe the case study which will be used throughout the thesis to demonstrate old methods vs new methods.
+
+\section{The Corridor}
+
+\subsection{Environment}
+\label{subsec:Environment}
+\subsection{People}
+\label{subsec:People}
+\subsection{Sensors + Actuators}
+\label{subsec:Sensors + Actuators}
+
+\section{Fire Evacuation and Navigation}
+This case study focuses on the concept of a deploying a CPS to aide in navigating a safe evacuation route during a fire alert. The CPS will take a distributed approach to determining a safe route, without the use of global maps or centralised decision nodes. Instead nodes will rely on only local layout knowledge and must determine safe routes through dissemination of locally safe paths.
+
+\subsection{Layout}
+Nodes will be placed along corridors, doorways and/or rooms equiped with fire detectors (smoke, heat, etc). Nodes will also be equiped with directional indicators to designate safe routes to an exit. Nodes can be of two types, a pathway node, or exit node. Exit nodes are placed adjacent to fire escape routes, such as stairwells, or exiting doors.
+
+\subsection{Invariants}
+\begin{itemize}
+  \item No node should direct towards fire.
+  \item No two adjacent nodes should point towards one another.
+  \item Exits near fire should be avoided.
+\end{itemize}
+
+\subsection{Algorithm design}
+\begin{verbatim}
+for(;;) {
+  wait_on_event();
+  if (ev == ON_FIRE) {
+    status = ON_FIRE;
+    broadcast(FIRE_ALERT);
+  } else if (ev == FIRE_ALERT) {
+      blacklist_dir(msg.src);
+      status = FIRE_ALERT;
+      broadcast(FIRE_ALERT);
+      if (self.type == EXIT) {
+        broadcast(SAFE_ROUTE);
+      }
+  } else if (ev == SAFE_ROUTE) {
+      whitelist_dir(msg.src);
+      broadcast(SAFE_ROUTE);
+  }
+}
+\end{verbatim}

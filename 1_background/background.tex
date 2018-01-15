@@ -1,0 +1,117 @@
+\chapter{Background (20-30Pages)}
+\section{Introduction}
+\label{sec:Introduction}
+Describe the state-of-the-art tools and techniques for debugging, testing and analysis of CPS systems.
+\begin{itemize}
+  \item Deep analysis and critical evaluation of key related work.
+  \item Cover breadth lightly about relevant work.
+  \item Show critical thinking and \textbf{GAPS}.
+  \item Discuss related info important to understanding thesis.
+\end{itemize}
+10-20pages
+
+\section{Testing Cyber-Physical Systems}
+\label{sec:Testing Cyber-Physical Systems}
+
+\subsection{Pre-deployments}
+\label{sub:Pre-deployments}
+Discuss using pre-deployments to test a CPS.
+\begin{itemize}
+  \item Real devices with real environment (context, light, radio, etc)
+  \item Time consuming, impracticle, infrequent phenomena, no debugging
+\end{itemize}
+
+\subsection{Test-beds}
+Discuss the use of test-beds for testing CPS, including the use of federated test-beds
+3-5 pages
+Mention the:
+\begin{itemize}
+  \item benefits of debugging tools (gdb)
+  \item Drawbacks of restricted deployment, fake environment
+\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Simulation}
+Discuss the use of simulation in testing Cyber-Physical systems as well as sensor networks and robotics.
+Mention the:
+\begin{itemize}
+  \item benefits of using gdb, speed and scalability
+  \item lack of environment simulation
+\end{itemize}
+
+Discuss the use of checkpointing
+5 pages
+\subsubsection{Contiki - Cooja}
+\label{sub:Contiki - Cooja}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{3D simulation - Robotics}
+\label{sub:3D simulation - Robotics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Mixed-simulation}
+Combination of virtual and real devices, for expanding a network or mapping real hardware (radios, sensors) to virtual nodes.
+2 pages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Analysing Cyber-Physical Systems}
+\label{sec:Analysing Cyber-Physical Systems}
+Discuss the techniques used for analysing CPS deployments with references to existing work.
+
+\subsection{Record and Replay}
+\label{sub:Record and Replay}
+
+\subsection{Tracing}
+\label{sub:Tracing}
+
+\subsection{Log Analysis}
+\label{sub:Log Analysis}
+
+\subsection{Visualisation}
+\label{sub:Visualisation}
+
+\subsection{Model Checking}
+\label{sub:Model Checking}
+Use model checking to generate scenarios based on parameters for \textbf{placement, power, number, design etc.}
+
+\section{Game Engines} % (fold)
+\label{sec:game_engines}
+% section time_control (end)
+3D games engines, such as Blender\cite{Blender}, Unity 3D\cite{Unity3D}, Unreal Engine 4\cite{Unreal} and CryEngine\cite{CryEngine}, power many of the current generation video games, providing players with game worlds filled with rich visuals, audio, physics and artificially intelligent (AI) agents.
+
+In order to support the high cost and time consuming nature of video game development, large development studios typically create a single game engine to support fast-paced development of a wide variety of games. These game engines provide an abstract foundation to build scenarios in, incorporating flexible design tools, 3D modelling, programming tool-sets (C++, C\#, etc), physics and lighting engines, networking, multi-player support and more recently virtual reality support, offering it commercially for smaller studios to bootstrap their game development.
+
+\subsection{Physics and Lighting}
+\label{subs:Physics and Lighting}
+Key features of games engines, aside from the 3D modelling and graphics tools, are their support for advanced physics and lighting simulations. Typically performed by middleware, physics engines, such as PhysX\cite{physx} and Havok\cite{havok}, provide real-time realistic physics including collision detection, rigid- and soft-body physics, forces and motion, fluid and particle simulation, and destruction. Using these tools, game worlds and the objects within react to the player as we would expect, such as objects falling due to gravity.
+Similarly, games engines also provide advanced lighting, enabling the use of both static and mobile lighting, with dynamic shadows, occlusion, reflection and refraction. Lighting is key to bringing virtual scenes to life, by illuminating spaces, guiding viewers attention and creating natural divisions between areas.
+
+
+\subsection{Update and Render cycle}
+\label{subs:Mode of Operation}
+In each time period, known as a tick, the game engine renders the 3D world using a two step method, update and render. On a tick, first, the state of the world is updated, allowing code to run for making AI decisions, physics simulations and updating character positions based on user input; second, these updates then applied to the world and rendered to the screen, known as a frame.
+
+The rate at which the 3D game engine can render to the screen is recorded in frames-per-second, with higher frame-rates providing smoother video with more responsive physics simulations and interactions, due to code running more frequently. However, even with decreased frame-rates (\textless60 FPS) the game still runs in real-time, albeit with the resulting video and simulations becoming jittery and input lag becomes significantly noticeable. Therefore, because code can only run once per tick, reducing the overheads in both simulation algorithms and rendering is paramount to increasing the frame-rate, thus improving the overall simulation. To a certain degree, high performance graphics cards can also significantly increase the speed of the render component of the tick (\textgreater120 FPS).
+
+\subsection{Continuous operations}
+\label{subs:Continuous operations}
+Whilst game code typically runs within the update and render thread described previously, some operations, such as long running or externally communicating ones, aren't suited to this approach. To solve this issue, it is also possible to run operations in continuous running threads outside of the main game thread (update and render). This allows the thread to run operations in parallel to the game and at a faster or slower rate than when tied to the limited frame-rate; this enables processes to process information independent of the frame-rate and provide more responsive feedback to external systems.
+
+
+\section{Virtual \& Augmented Reality} % (fold)
+\label{sec:virtual_reality_&_ar}
+
+% section virtual_reality_&_ar (end)
+% section game_engines_vr_&_ar (end)
+\section{Summary} % (fold)
+\label{sec:summary}
+Purpose of this section is to show:
+\begin{itemize}
+  \item state of the art
+  \item critical thinking
+  \item gap analysis
+\end{itemize}
+% section summary (end)

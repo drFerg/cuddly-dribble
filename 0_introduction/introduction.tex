@@ -1,0 +1,84 @@
+\chapter{Introduction}
+% \section{Titles}
+% \label{sec:Titles}
+% \begin{itemize}
+%   \item Debugging and Testing Cyber-Physical Systems in the Virtual-World
+%   \item Building more accurate CPS simulations using cross-simulation/pre-deployments
+%   \item Integrating context simulation with Cyber-Physical System simulations
+%   \item Debugging and Analysing Cyber-Physical Systems using Virtual Environments/Reality
+%   \item Testing Cyber-Physical Systems in the Virtual World
+
+% \end{itemize}
+
+
+Cyber Physical systems bridge the boundary between the virtual and real world, the cyber and physical, respectively, in which the virtual directly impacts the real, and vice-versa.
+CPS rarely consist of a singular device, but are instead made up of myriads of different devices, each of which perform actions towards one or more collective goals, distributed across the physical environment.
+As these systems become relied upon for providing more critical services within our physical environment, more focus is needed on ensuring these systems perform correctly once deployed in their target environment.
+
+
+\section{Motivation}%Discuss the Motherhood
+\label{sec:Motivation}
+Why is it important to have a better simulation tool for CPS testing and analysis.
+
+\section{Problem}
+\label{sec:Problem}
+
+
+Testing CPS is carried out in two main phases, simulation and pre-deployment. 
+
+Simulations are used to develop and iterate algorithms quickly and efficiently, without the overheads, time and cost, associated with programming and deploying physical devices. However, the simulators lack the ability to simulate the physical aspects of the CPS. Developers instead rely upon recorded data, manual input or fabricated scripts to act as the environment and close-the-loop within the simulation. Recorded data provides a realistic input from a singular perspective, but the data is fixed and can't be adapted to suit different sizes or layouts of a CPS. Manual input and scripts provide some more flexibility but only at a limited scale, still requiring considerable work to change and adapt to different sizes or layouts. Similarly, these also depend on a developer's model of the environment, which may not be an accurate representation of what can exist or occur within the real counterpart.
+
+On the other hand, pre-deployment tests can be carried out once an application is deemed stable, and full integration and reliability tests are needed, providing a realistic mini-deployment to test the interactions between the cyber and phyiscal components of the system within. However, pre-deployments are expensive and time-consuming to run, due to device acquisition and physical deployment, respectively. Pre-deployments are also limited in what can be tested, due to physical or cost constraints, and health and safety. 
+
+
+Describe the problem upfront for CPS expert audience:
+\begin{itemize}
+  \item Must test CPS using pre-deployments and simulation.
+  \item How to simulate environment, people, phenomena? Accurately? Virtual world?
+  \item How can we analyse these systems in-place, in real-time, in an intuitive way?
+  % \item Can we formally test parts of the system, using counter-examples or satisfiably generated tests?
+  \item Can we validate and compare testing in the virtual world using real deployments?
+  \item How can we transfer these tools and apply them in the real-world? (AR).
+\end{itemize}
+
+
+
+
+\section{Objectives}
+\label{sec:Objectives}
+How does this thesis aim to resolve the problem outlined above?
+
+\section{Contributions}
+\label{sec:Contributions}
+Discuss our outputs?
+\begin{itemize}
+  \item 3D CPS Simulation platform
+  \item Visual Diffing tools for analysing 3D simulations in real-time
+  \item Visual Diffing tools transferred into AR for use in real-world
+  % \item SMT assisted test case generation run within platform
+  % \item Validation and adaption techniques for enhancing simulation accuracy.
+\end{itemize}
+
+We make the following contributions:
+\begin{itemize}
+  \item Framework - A co-simulator framework for the development and testing of indoor Cyber-Physical systems \ref{chapter:framework}. The framework provides the scaffolding for performing a collection of co-simulations utilising different tools for real-time simulation analysis.
+  \item 3D Simulator - A novel 3D CPS co-simulator for deploying CPS within a 3D virtual world utilising realistic physics, lighting and human mobility.
+  \item Visual Diffing toolset - A novel simulation analytics tool-kit for comparing two simulations in real-time from within the 3D virtual environment.
+\end{itemize}
+
+\section{Statement of Originality}
+
+Statement here.
+
+
+\section{Publications}
+
+Publications here.
+
+% \section{Thesis outline}
+% \label{sec:Thesis outline}
+% \begin{itemize}
+%   \item Design and Implement Cyber-physical co-simulator
+%   \item Introduce formal specifications into simulations, testing counterexamples and coverage
+%   \item Determine sameness of Virtual and Real executions, use diffs to learn and improve
+% \end{itemize}

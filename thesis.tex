@@ -1,0 +1,51 @@
+\documentclass[a4paper,12pt,twoside]{report}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=3cm]{geometry}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{svg}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\include{thesis.preamble}
+
+
+\begin{document}
+
+\title{\LARGE {\bf A Framework for Simulating Cyber Physical Systems using Virtual and Augmented Reality}\\
+ \vspace*{6mm}
+}
+
+\author{Fergus Leahy}
+\submitdate{October 2018}
+\institution{Imperial College London}
+
+\normallinespacing
+\maketitle
+
+\preface
+\input{0_abstract/abstract}
+\input{acknowledgements/acknowledgements}
+\input{dedication/dedication}
+\input{quotes/quotes}
+
+\body
+\input{0_introduction/introduction}
+\input{1_background/background}
+\input{framework/chapter}
+\input{caseStudy/chapter}
+\input{architecture/chapter}
+\input{visualDiffing/chapter}
+\input{chapter5/chapter}
+
+% body of thesis comes here
+
+\input{conclusion/conclusion}
+
+\appendix
+% appendices come here
+
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{alpha}
+\bibliography{bibliography/bibliography}
+
+\end{document}
