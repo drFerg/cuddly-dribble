@@ -11,8 +11,9 @@
 
 Despite the distributed and physical nature of cyber-physical systems and the Internet of Things, tools and techniques to support the needs of their development have not evolved to support efficient and reliable testing in the context of the deployment environment. Many tools exist which support individual aspects of testing and development, however, each one is siloed from the rest, limiting the overall ability and coverage of testing.
 
-This chapter proposes a set of ideals and a design for building a next-generation co-simulation framework that considers the environment as a first-class citizen, enables visual cross-comparison between simulated runs and actively supports integration of multiple simulation and analytical tools to provide the ultimate tool-kit for developing and testing cyber-physical systems.
+This chapter presents a CPS co-simulation framework designed to close the cyber-physical loop in CPS testing. Treating the physical environment as a first class citizen, the framework makes it possible for developers to simulate and test CPS within a 3D virtual environment, pre-deployment. A CPS interacts with and is directly affected by its target environment and inhabitants within it, . The framework makes it easier for developers to test and analyse CPS which rely upon human mobility and device placement.
 
+The following sections in this chapter outline a set of requirements \ref{sec:requirements} for the framework, a distributed design for building a co-simulation platform supporting plug-and-play of multiple tools, including a sensor network simulator and 3D game engine. Finally, we describe several case studies which are used to demonstrate and evaluate the co-simulation framework and its features.  
 
 
 % Drill down into the perfect or ideal scenario, what we want to be able to do
@@ -20,7 +21,7 @@ This chapter proposes a set of ideals and a design for building a next-generatio
 % Space(Placement), Time(control), People(Mobility)
 \section{The Ideal System}
 \label{sec:Requirements}
-This section descibes a key set of requirements that are necessary for a framework to support simulating and testing cyber-physical systems in virtual environments not only comprehensively and accurately, but also efficiently and effectively, such that developers benefit from using such a tool over simply testing in the real world or in a sensor network simulator.
+This section describes a key set of requirements that are necessary for a framework to support simulating and testing cyber-physical systems in virtual environments not only comprehensively and accurately, but also efficiently and effectively, such that developers benefit from using such a tool over simply testing in the real world or in a sensor network simulator.
 
 Each of these requirements focus on key aspects needed for the framework to be effective for testing cyber-physical systems, which are deeply integrated into our physical world.
 
@@ -28,16 +29,15 @@ Each of these requirements focus on key aspects needed for the framework to be e
 \label{sub:requirements_3D design and placement}
 The issue of placement in CPS is tightly coupled to provisioning, i.e., what is the minimum number of devices needed and where should these devices then be placed in order to acheive the desired coverage, reliability, or other desired metric. 
 Understanding how many devices are needed for a specific deployment and where to place them within the environment is a difficult challenge pre-deployment. Often based on guess-work, trial-and-error and field studies, which can lead to both over- and under-provisioning, resulting in either high-cost, a lack of network reliability, insufficient or redundant sensor data, etc. 
-Thus, virtually experimenting with placement ahead of time will help mitigate some of these issues before deployment. 
+Thus, virtually experimenting with placement ahead of time will help mitigate these issues before deployment. 
 
-Testing different placement strategies should be quick and efficient without the need to manually change scripts and sensor input traces; instead, using dynamically generated inputs to test. Similarly, developers should be able to flexibly scale the levels of device provision, to test and undestand how it will affect a deployment. Ideally, the system should support automatically testing and suggestion of optimum placement and provisioning levels, based of some selected criterion, such as cost, quality-of-service, robustness, etc.
+Testing different placement strategies should be quick and efficient without the need to manually change scripts and sensor input traces; instead, the simulator should dynamically generate inputs for devices under test. Similarly, developers should be able to flexibly scale the levels of device provision, to test and understand how it will affect a deployment. Ideally, the system should support automatically testing and suggestion of optimum placement and provisioning levels, based of some selected criterion, such as cost, quality-of-service, robustness, etc.
 
 \subsection{Phenomena-on-demand}
 \label{sub:requirements_Phenomena-on-demand}
-In order to test a CPS in the real-world, developers often need to wait for or force desired phenomena to occur in order to observe how the system reacts and whether or not it reacts correctly. However, exercising control over the real-world is a difficult and time-consuming challenge, and often not feasible due to health and safety concerns, e.g., evacuation. 
-Ideally, the framework should provide a dynamic and flexible method to create and/or script phenomena which interact with the system on demand.
+In order to test a CPS in the real-world, developers often need to wait for or force desired phenomena to occur in order to observe how the system reacts and whether or not it reacts correctly. However, exercising control over the real-world is a difficult and time-consuming challenge. Similarly, enlisting human participants to perform repetitive mundane tasks, requires paperwork, significant time and often money. Lastly, some scenarios are simply not feasible to test due to their scale, a deployment environment's limited access or health and safety concerns, e.g., outdoor environments, evacuation, fire, flooding.
 
-Unlike traces, a scripted phenomena, such as a person walking down a corridor, only needs to be updated once to change path, whereas, multiple traces feeding sensors simulated ``detections'' inputs need to be updated for each sensor device in the person's path, a time-consuming and un-scalable solution.
+Ideally, the framework should provide a dynamic and flexible method to create and/or script phenomena which interact with the system on demand. Unlike traces, a scripted phenomena, such as a person walking down a corridor, only needs to be updated once to change path with the virtual world dynamically generates sensor input, whereas, multiple traces feeding sensors simulated ``detections'' inputs need to be updated for each sensor device in the person's path, a time-consuming and unscalable solution.
 
 %%%%%%%%%%%%%%%%%%%%
 
@@ -45,9 +45,9 @@ Unlike traces, a scripted phenomena, such as a person walking down a corridor, o
 \label{sub:requirements_mobility}
 Existing tools support the concept of device mobility, updating a device's radio model based on its location. However, in these tools device mobility in is pre-determined; in other words, developers define mobility patterns, as a sequence of positions, manually, which the network of devices must follow, but don't react to the live cyber-physical simulation. The tools have no concept of other entities, such as people, physical objects or gravity.
 
-Because of the lack of support for simulating human mobility, developers are required to either manually trigger sensors or create custom mobility model scripts for each test scenario, in which the script triggers button presses or motion sensors at specific time intervals. As the network grows, shrinks or the layout changes, developers need to update the model for each device; this quickly becomes unmanagable as the network and number of tests scale in size.
+Because of the lack of support for simulating human mobility, developers are required to either manually trigger sensors or create custom mobility model scripts for each test scenario, in which the script triggers button presses or motion sensors at specific time intervals. As the network grows, shrinks or the layout changes, developers need to update the model for each device; this quickly becomes unmanageable as the network and number of tests scale in size.
 
-Ideally, the framework should support testing CPS utilising real-time dynamic human (and device) mobility, enabling simulations to support testing environments in which virtual human participants interact with and are affected by the CPS and the environment, closing the cyber-phyiscal loop. In other words, virtual participants are able to autonomously navigate an environment, based on flexible pre-assigned behaviours; including simple actions, such as patrol this corridor or walk to location A; or more complex behaviours, such as follow or avoid person X, wait on an event before moving. Whilst target locations may be pre-defined, routes may change in real-time based on obstacles or other behaviours. By combining behaviours, participants can dynamically generate phenomena for the CPS to sense and react to, in turn forcing the participants to react, and so on. 
+Ideally, the framework should support testing CPS utilising real-time dynamic human (and device) mobility, enabling simulations to support testing environments in which virtual human participants interact with and are affected by the CPS and the environment, closing the cyber-physical loop. In other words, virtual participants are able to autonomously navigate an environment, based on flexible pre-assigned behaviours; including simple actions, such as patrol this corridor or walk to location A; or more complex behaviours, such as follow or avoid person X, wait on an event before moving. Whilst target locations may be pre-defined, routes may change in real-time based on obstacles or other behaviours. By combining behaviours, participants can dynamically generate phenomena for the CPS to sense and react to, in turn forcing the participants to react, and so on. 
 
 Using such a system, when simulating a fire evacuation scenario, participants dynamically react to fire avoiding it as it spreads throughout the environment, with the CPS able to sense, alert and direct evacuees towards safe exits.
 
@@ -63,11 +63,11 @@ On top of this, it should also be possible to provide complex mobility and crowd
 In real-world deployments developers have no control over time and have to analyse events as they happen or rely on logs and video to record and view post-test. Simulation approaches enable pausing and slowing time, giving developers more time to analyse snapshots or small windows of time in a test, however, recording still utilises log-based approaches, providing only a limited snapshot. Both approaches provide limited views into a test, if events were not recorded, via logs, video or otherwise, they are lost and the test must be re-run.
 Recording everything would enable a simulator to create a full reconstruction and allow developers to master time-control, moving forwards and backwards through a simulation to view its state at any point in time. Within a 3D environment, this would also allow developers to observe the context in which particular phenomena occur, enabling in-depth and contextual analysis.
 
-Naturally, the system should support recording arbitrarily long, such as day- or even week-long, simulations, enabling logitidunal testing of CPS applications in real-time or faster. The system must also provide the means to quickly scrobble through recordings, based on time or checkpoints, generated based on points of interest.
+Naturally, the system should support recording arbitrarily long, such as day- or even week-long, simulations, enabling longitudinal testing of CPS applications in real-time or faster. The system must also provide the means to quickly scrobble through recordings, based on time or checkpoints, generated based on points of interest.
 
 \subsection{Distributed component-based simulation} % (fold)
 \label{sub:distributed}
-The co-simulator should be discretised into components with clear interfaces; such that the architecure allows for distributing components across multiple machines. Similarly, the architecture should support for allowing virtual components to be swapped out for other components, or their real counterparts e.g., swapping out a set of virtual simulated nodes for a set of real deployed hardware nodes.
+The co-simulator should be discretised into components with clear interfaces; such that the architecture allows for distributing components across multiple machines. Similarly, the architecture should support for allowing virtual components to be swapped out for other components, or their real counterparts e.g., swapping out a set of virtual simulated nodes for a set of real deployed hardware nodes.
 
 % subsection distributed (end)
 % Unlike in real world deployments, developers have the power to control time in the simulated world. Developers can: stop-the-clock, freezing both the simulation and world in time, whilst giving them full control over what they see, allowing more time to observe the environment and move between points of interest; slow down time, giving developers more time to observe or control the simulation; or even speed up time, providing desired results in considerably less time.
@@ -75,9 +75,9 @@ The co-simulator should be discretised into components with clear interfaces; su
 
 \subsection{Visualisation (Visual Diffing, Analytics)}
 \label{sub:requirements_Visualisation}
-To complement log output, existing CPS simulators provide basic visualisations, such as 2-dimensional network maps and tranmission timelines, giving developers more insight into the network component in real-time. Many of these visualisations are transient and can only be viewed once as the simulation is on going. Thus, when trying to compare two separate simulation runs, developers still need to resort to post-simulation log analysis using external tools to manually process the log output, without the context of the simulation visualisation. 
+To complement log output, existing CPS simulators provide basic visualisations, such as 2-dimensional network maps and transmission timelines, giving developers more insight into the network component in real-time. Many of these visualisations are transient and can only be viewed once as the simulation is on going. Thus, when trying to compare two separate simulation runs, developers still need to resort to post-simulation log analysis using external tools to manually process the log output, without the context of the simulation visualisation. 
 
-When simulating in the context of a 3D virtual world, visualisations must add value to already busy simulations, with the aim to reduce the visual noise, not add to it. Thus, visualisations should not simply be added ontop of the 3-dimensional virtual world, instead they should seamlessly integrate into the virtual environment to provide intuitive visual feedback, indicating points of interest, such that they further enhance a developers analytical tool-kit and understanding of an on-going simulation. 
+When simulating in the context of a 3D virtual world, visualisations must add value to already busy simulations, with the aim to reduce the visual noise, not add to it. Thus, visualisations should not simply be added on top of the 3-dimensional virtual world, instead they should seamlessly integrate into the virtual environment to provide intuitive visual feedback, indicating points of interest, such that they further enhance a developers analytical tool-kit and understanding of an on-going simulation. 
 
 Ideally, visualisations should help developers to spot and analyse differences between multiple runs in real-time, without the need the need to leave the tool to perform post-simulation data analysis using manual tools. These visual differencing tools, would allow developers to specify events of interest to watch, which the simulator then visually flags to the user when it happens, e.g., a node glows red when it's power levels drop below a certain point, or differ from a previous simulation run by x\%. Similarly, visualisations should also support longitudinal studies of systems.
 
@@ -104,7 +104,7 @@ Using a single language for both testing and deployment, in the real- and virtua
 
 \subsection{Performance}
 \label{sub:requirements_real-time_operation}
-The system should support real-time operation so that simulations run as fast as, if not faster than their real counterparts, enabling quicker deploy-test-debug cycles. Similarly, it needs to be responsive to real-time direct interaction by developers, such that developers can observer, interact with and change ongoing simulations. Thus, in order for the framework to run in real-time, each of the components must also run accordingly. In order for the sensor network simulator to run in real-time, the 3D game engine must respond to all requests in real-time (sensor reads), such that the virtual hardware is in-discernable from the real counterpart.
+The system should support real-time operation so that simulations run as fast as, if not faster than their real counterparts, enabling quicker deploy-test-debug cycles. Similarly, it needs to be responsive to real-time direct interaction by developers, such that developers can observer, interact with and change ongoing simulations. Thus, in order for the framework to run in real-time, each of the components must also run accordingly. In order for the sensor network simulator to run in real-time, the 3D game engine must respond to all requests in real-time (sensor reads), such that the virtual hardware is in-discernible from the real counterpart.
 
 \subsection{Synchronisation}
 \label{sub:requirements_synchronisation}
@@ -158,7 +158,7 @@ The current state-of-the-art for cyber-physical systems focuses on the network a
 The goal of this framework is to provide a stable and extensible platform into which a variety of tools can be integrated into to support the simulation, testing, modelling and analysis of cyber-physical systems.
 
 This section proposes an architecture for designing a distributed framework supporting the co-simulation and analysis of cyber-physical systems using multiple different tools.
-This will enable information sharing between tools, enabling these tools to serve their purpose and close the loop, e.g., 3D simulator updates positions of devices based on physical interaction with the virtual world, this is then reflected in the network simulator which affects the radio tranmission range and interference.
+This will enable information sharing between tools, enabling these tools to serve their purpose and close the loop, e.g., 3D simulator updates positions of devices based on physical interaction with the virtual world, this is then reflected in the network simulator which affects the radio transmission range and interference.
 
 
 

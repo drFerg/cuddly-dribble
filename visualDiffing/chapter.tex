@@ -4,9 +4,11 @@
 \label{sec:Problem}
 Testing a CPS in either simulation or the real-world typically involves recording data to logs and either reading or processing (using tools or custom scripts) the logs off-line, in order to analyse, discover and diagnose issues. Simulation tools provide the possibilities to record more information due to the increased locality, however, are still limited in how they can present it to users, still heavily relying of recorded logs.
 
-Processing the log data manually is extremely time-consuming and only provides limited context given the amount of information a developer can read and process at one time. Utilising scripts or external data analytical tools can provide more inuitition about the data in significantly less time, however, results are provided off-line and outwith the context of the experiment.
+Processing the log data manually is extremely time-consuming and only provides limited context given the amount of information a developer can read and process at one time. Utilising scripts or external data analytical tools can provide more intuition about the data in significantly less time, however, results are provided off-line and outwith the context of the experiment.
 
-Testing in the virtual world provides developers with access to significantly larger volumes of data about a simulation than is possible to record from the real world, including information about entities in the world; combined with a fully customisable and controllable 3D world, this opens up the possibilities to more advanced analytics. However, this benefit comes at a cost. Firstly, with such large volumes of data, at the rate of gigabytes per hour, how can developers process, analyse and make use of all the data in real-time, without resorting to reading and parsing logs? Secondly, how can developers visually compare and constrast two or more simulations, to identify differences when performing A-B testing?
+Testing in the virtual world provides developers with access to significantly larger volumes of data about a simulation than is possible to record from the real world, including information about entities in the world; combined with a fully customisable and controllable 3D world, this opens up the possibilities to more advanced analytics. 
+
+However, this benefit comes at a cost. Firstly, with such large volumes of data, at the rate of gigabytes per hour, how can developers process, analyse and make use of all the data in real-time, without resorting to reading and parsing logs? Secondly, using this data, how can developers visually compare and contrast two or more simulations, to identify differences when performing A-B testing?
 
 \begin{itemize}
   \item Data Volume, how to compress and index in real-time or faster
@@ -16,10 +18,12 @@ Testing in the virtual world provides developers with access to significantly la
 
 \section{Visual Diffing}
 \label{sec:visualDiffing}
-Understanding differences between two or more entities is a common but vital task across variety of domains, including text, image, voice and video analysis. System administrators or developers who need to know the differences between two text files employ the `diff' UNIX tool\footnotemark, which highlights lines that don't match between files; Doctors and medical staff compare medical scans, often overlaying one onto the other with a backlight, to help spot key differences; In sports, video replays are combined to show two or more racers simultaneously, or utilise high-speed multi-camera arrays to generate 3D models to discover if tennis shots are out of bounds.
+Understanding differences between two or more entities is a common but vital task across variety of domains, including text, image, voice and video analysis. System administrators or developers who need to know the differences between two text files employ the `diff' UNIX tool\footnotemark, which highlights lines that don't match between files; Doctors and medical staff compare medical scans, often overlaying one onto the other with a backlight, to spot key differences; In sports, video replays are combined to show two or more racers simultaneously (Dartfish), or utilise high-speed multi-camera arrays to generate 3D models to discover if tennis shots are out of bounds (Hawk-eye).
 \footnotetext{From which the term visual diffing is coined.} 
 
-Inspired by its use in other domains, visual differencing, ``visual diffing'' for short, enables viewers to observe the both visible and non-visible differences between two or more instances of an event incorporated directly into the visual medium itself i.e., rather than overlaying abstract data metrics, such as speed or time, over a video, image or simulation, requiring viewers to conciously analyse, visual diffing utilises visual techniques and clues integrated into the scene which enable viewers to intuitively visually observe differences and areas of interest without needing to remember and compare abstract metrics.  
+Inspired by its use in other domains, visual differencing, ``visual diffing'' for short, enables viewers to observe the both visible and non-visible differences between two or more instances of an event incorporated directly into the visual medium itself. This contrasts to overlaying abstract data metrics, such as speed or time, over a video, image or simulation, requiring viewers to consciously analyse. Instead, visual diffing utilises visual techniques and clues integrated into the scene which enable viewers to intuitively visually observe differences and areas of interest without needing to remember and compare abstract metrics.
+
+Whilst not formally described as visual diffing in other domains, techniques which can be described as such can be found in sports coverage and a variety of other media, shown in figure \ref{fig:visual_diff_sports}.
 
 \begin{figure*}[th!]
 \subfloat[The Hawk-Eye system showing where all service shots for a player land within the court.]{
@@ -52,8 +56,9 @@ Inspired by its use in other domains, visual differencing, ``visual diffing'' fo
 
 \subsection{Techniques} % (fold)
 \label{sub:techniques}
+The simplest of visual diffing techniques show spatial differences between entities in a scene, enabling observers to interpret the distance and difference in speed. Depending on the medium, image or video, different techniques are more affective for presenting information. Other techniques can help better translate non-visible data metrics, such as acceleration, speed, type, etc, to physical attributes, such as size and colour. 
 
-Common visual diffing techniques used today include:
+A non-exhaustive list of visual diffing techniques commonly used include:
 
 \textbf{Ghosts}\footnotemark, a common technique used in sports, in which two or more people or objects occupy the same on-screen environment, enabling visual comparisons of differences in position, speed and movement of participants. For example, shown in figure \ref{fig:dartfish}; two individual slalom skiers racing in time-trials, are visually overlaid as ghosts onto the same race track. This provides viewers with a visually exciting but also intuitive experience as the race progresses, without the need to resort to just time metrics. 
 
@@ -63,49 +68,61 @@ Common visual diffing techniques used today include:
 
 \textbf{Colour + Size}, enables non-visual data to be presented via a visual medium. Colour and size can be used to display both discrete and continuous data, providing more information or highlighting hidden points of interest typically missed e.g., a set of colours can denote states, such as red, yellow and green, or a gradation of colour and size can be used to signify the strength or intensity of a data. Figure \ref{fig:hawk_eye} utilise colour to provide meta-data about different tennis serves, whether they were first, second or ace serves. 
 
-
-\textbf{Heatmaps}, show the frequency of an entity or an action being carried out at a specific location within a space, through colour intensities displayed over a map. This provides at a glance where hot- and cold-spots of activity are within an environment, enabling viewers to instantly located areas of interest. Figure \ref{fig:hawkeye_heatmap} shows a heatmap overlayed onto a tennis court showing where the tennis players have returned shots since the start of the match, with higher frequency areas show increasingly intense colours, from green to yellow to red.
+\textbf{Heatmaps}, show the frequency of an entity or an action being carried out at a specific location within a space, through colour intensities displayed over a map. This provides at a glance where hot- and cold-spots of activity are within an environment, enabling viewers to instantly locate areas of interest. Figure \ref{fig:hawkeye_heatmap} shows a heatmap overlayed on a tennis court, showing where the tennis players have returned shots since the start of the match, with higher frequency areas show increasingly intense colours, from green to yellow to red. Heatmaps are very effective for showing accumulative data  
 
 % subsubsection techniques (end)
 
 \section{Recording and Time Control}
 \label{sec:recording}
-Running and recording simulations in a 3D virtual world opens up the opportunity for fully-reconstructed replays, utilising data recorded from both the CPS simulation and from virtual world. Unlike other approaches which only record log output, these reconstructed replays allow viewers to see the cyber-physical cause and effect after-the-fact. 
+Recording CPS tests in real-world deployments is a difficult and time-consuming task, requiring not only recording and retrieving logs from a network of devices, but also video recording environments when physical phenomena are involved, such as people interacting with the system. Recording in the real-world is a ``one-shot'' chance, where anything missed, due to not being recorded in a log or within the video frame, can't be retrieved, requiring either guesstimating or a test re-run. Recording large volumes of data on-device may not be possible due to the constrained hardware, similarly, the network bandwidth may not support such data either, not without having adverse affects on the rest of the CPS. 
 
-Providing this level of replayability enables the possibility of much more comprehensive post-simulation reviewal. For real-world deployments, simple video recordings which may be carried out and are limited to the recorded view(s) and areread-only once recorded. Instead, by recording reconstructions, viewers are able to fully manipulate replays and are able to integrate analytics and tools that manipulate the output on-demand e.g., changing viewing angles/position and altering what visual diffs are applied.
+Running simulations in a 3D virtual world opens up the opportunity for recording reconstruct-able replays, utilising data recorded from both the CPS simulation and from virtual world. Unlike other real-world or simulation recording approaches, these reconstructed replays allow viewers to see the cyber-physical cause and effect after-the-fact. Similarly, by recording at the simulation level, application code doesn't need to be edited to support it, ensuring application logic and control-flow consistency is guaranteed between testing and deployment.
 
+Providing this level of replayability enables more comprehensive post-simulation review and analysis. For real-world deployments, simple video recordings which may be carried out and are limited to the recorded view(s) and are read-only once recorded. Instead, by recording reconstructions, viewers are able to manipulate time and space within replays, pausing, fast-forwarding and replaying events from any angle within the scene. Reconstructions also allow for analytics to be seamless added to or removed from the replay in real-time, such as ghosts, providing a dynamic and flexible tool-kit e.g., changing viewing angles/position and altering what visual diffs are applied.
+
+Recording long-term simulations provides different challenges, not only requiring efficient storage of the reconstruction, but also how to efficiently access, index and review the points-of-interest. Solving these issues opens up the opportunity to run longitudinal CPS studies for testing robustness and reliability, even against running systems e.g., a real running system could run parallel to a upgraded simulated version, feeding inputs and testing whether the new version maintains the same functionality.
 
 \begin{itemize}
   \item Gigabytes of data per hour, how to store, compress, index...
   \item Synchronising recordings, replay, rewind, fast-forward efficiently.
 \end{itemize}
-\subsection{Raw} % (fold)
+
+\subsection{Recording Data} % (fold)
+\label{sub:recording_data}
+Simulation within the co-simulation platform targets 60FPS to provide a smooth and responsive simulation. Thus, recording enough data to support creating reconstructions matching the original run requires logging the attributes of every entity within the world and CPS simulator at 60x per second, including location, rotation, speed and other internal state. This can generate GBs of data per hour without optimisation, limiting simulation recordings to several hours on an average workstation.
+
+The following sections describe several optimisations and techniques used to improve the space-saving yield whilst maintaining the smooth performance.
+% subsection recording_data (end)
+\subsubsection{Raw} % (fold)
 \label{sub:raw}
 
-% subsection raw (end)
+% subsubsection raw (end)
 
-\subsection{Compressed} % (fold)
+\subsubsection{Compressed} % (fold)
 \label{sub:compressed}
 
-% subsection compression (end)
+% subsubsection compression (end)
 
-\subsection{Chunked compression} % (fold)
+\subsubsection{Chunked compression} % (fold)
 \label{sub:chunked_compression}
 
 \section{Full Time Control} % (fold)
 \label{sec:full_time_control}
 
 % section full_time_control (end)
-% subsection chunked_compression (end)
-\section{Visual Diffing in the Simulator} % (fold)
-\label{sec:visual_diffing}
-
-% section visual_diffing (end)
+% subsubsection chunked_compression (end)
 
 % section diffing_two_cps_visually (end)
-\section{Indexing long-term simulations} % (fold)
+\section{Accessing Long-term simulations} % (fold)
 \label{sec:indexing_long_term_simulations}
+\subsection{Scrobbling} % (fold)
+\label{sub:scrobbling}
 
+% subsection scrobbling (end)
+\subsection{Indexing Points-of-Interest} % (fold)
+\label{sub:indexing_points_of_interest}
+
+% subsection indexing_points_of_interest (end)
 % section indexing_long_term_simulations (end)
 \section{Case Study Analysis}
 \label{sec:Case Study Analysis}
