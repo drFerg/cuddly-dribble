@@ -134,11 +134,11 @@
 }
 
 
-\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
+\usepackage[colorinlistoftodos,prependcaption,textsize=small,]{todonotes}
 \newcommand{\sidenote}[1]
- {\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red]{#1}}
+ {\todo[inline, linecolor=red,backgroundcolor=red!25,bordercolor=red]{#1}}
 
-
+\usepackage{amssymb}
 \newcommand{\TODO}[1]{
  \par\noindent{\sffamily\textbf{TODO}~$\blacktriangleright$~ #1}
 }

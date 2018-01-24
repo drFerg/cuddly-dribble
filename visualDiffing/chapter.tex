@@ -2,9 +2,9 @@
 
 \section{Problem}
 \label{sec:Problem}
-Testing a CPS in either simulation or the real-world typically involves recording data to logs and either reading or processing (using tools or custom scripts) the logs off-line, in order to analyse, discover and diagnose issues. Simulation tools provide the possibilities to record more information due to the increased locality, however, are still limited in how they can present it to users, still heavily relying of recorded logs.
+Testing a CPS in either simulation and the real-world typically involves recording data to logs, before then reading and processing (using tools or custom scripts) the logs off-line, in order to analyse, discover and diagnose issues. Simulation tools provide the possibilities to record more data due to the increased access and lack of constrained hardware, however, are still limited in how they can present it to users, still heavily relying of textual logs.
 
-Processing the log data manually is extremely time-consuming and only provides limited context given the amount of information a developer can read and process at one time. Utilising scripts or external data analytical tools can provide more intuition about the data in significantly less time, however, results are provided off-line and outwith the context of the experiment.
+Processing log data manually is extremely time-consuming and only provides limited context given the amount of information a developer can read and process at one time. Utilising scripts or external analytical tools can provide more intuition about the data in significantly less time, however, results are provided off-line and outwith the context of the experiment.
 
 Testing in the virtual world provides developers with access to significantly larger volumes of data about a simulation than is possible to record from the real world, including information about entities in the world; combined with a fully customisable and controllable 3D world, this opens up the possibilities to more advanced analytics. 
 
@@ -89,28 +89,80 @@ Recording long-term simulations provides different challenges, not only requirin
 
 \subsection{Recording Data} % (fold)
 \label{sub:recording_data}
-Simulation within the co-simulation platform targets 60FPS to provide a smooth and responsive simulation. Thus, recording enough data to support creating reconstructions matching the original run requires logging the attributes of every entity within the world and CPS simulator at 60x per second, including location, rotation, speed and other internal state. This can generate GBs of data per hour without optimisation, limiting simulation recordings to several hours on an average workstation.
+Simulation within the co-simulation platform targets 60FPS to provide a smooth and responsive simulation. Thus, recording enough data to support creating reconstructions matching the original run requires logging the attributes of every entity within the world and CPS simulator at 60x per second, including location, rotation, speed and other entity-specific internal state. This can generate GBs of data per hour without optimisation, limiting simulation recordings to several hours on an average workstation.
 
 The following sections describe several optimisations and techniques used to improve the space-saving yield whilst maintaining the smooth performance.
 % subsection recording_data (end)
 \subsubsection{Raw} % (fold)
 \label{sub:raw}
+In order to record full reconstructions, the simulator needs to record both visible and non-visible behaviour i.e., both physical and internal state. Such data includes, position, rotation, trajectory, sensor data, transmission state, etc. By ensuring as much information as possible is stored, future reviews are able to view and process not just what developers thought might have been necessary when they ran the test. However, this extra information comes at a cost, as shown in figure \ref{tab:recording_costs}.
 
+At each time slice, a snapshot of an entity's state is stored as part of its history, in chronological order starting from time t0. Thus, in order to rewind to a previous state, the simulator simply sets the entity's state equal to the snapshot. For moving to a specific time point, the simulator uses the time stamp as an index to locate the correct snapshot, then simply sets the state to that.
+\sidenote{Revisit how it moves to a specific time point}
+\begin{table}
+	\centering
+	\caption{Recording costs of objects within the simulator}
+	\begin{tabular}{|c|c|c|c|}
+	\hline
+	Data & Size & 1min Total & 1hr Total\\\hline
+	Location & 16Bytes & 56KBytes & 3.2MBytes\\\hline
+	Rotation & 16Bytes & 56KBytes & 3.2MBytes\\\hline
+	Scale & 16Bytes & 56KBytes & 3.2MBytes\\\hline
+	Velocity & 16Bytes & 56KBytes & 3.2MBytes\\\hline
+	Angular Velocity & 16Bytes & 56KBytes & 3.2MBytes\\\hline
+	Time Stamp & 4Bytes & 1.4KBytes & 84KBytes\\\hline
+	Sensor State & 39Bytes & 137KBytes & 8MBytes\\\hline
+
+	\end{tabular}
+	\label{tab:recording_costs}
+\end{table}
 % subsubsection raw (end)
 
-\subsubsection{Compressed} % (fold)
+\subsubsection{Optimisations/Compression} % (fold)
 \label{sub:compressed}
+To reduce the amount of data recorded, instead of storing a snapshot of an entity at every tick (60FPS), we can instead store one only when some or all of its state has changed, thus saving considerable amount of space for entities which become inactive, physically or virtually; however, for simulations where all entities are active, the savings may be limited. 
 
+When using this technique, searching for specific time points becomes more difficult as there may not be a corresponding snapshot for an entity, instead the last recorded snapshot before the requested time point should be used.
+
+To further improve upon this, each snapshot only contains what has changed between time slices, starting from time t0. When rewinding or fast-fowarding through a continuous time period, these delta snapshots can be applied like before, only updating the changed state. However, providing random access to the history becomes more difficult, due to the snapshot containing only what has changed, if any snapshot exists at all for that time point. It's therefore necessary to start from t0 and apply each snapshot in turn until the requested time point is reached, O(n). Alternatively, at a set interval -- checkpoint, a full snapshot could be stored, enabling faster state restoring, O(n/m).
+\TODO{Discuss the use of state change optimisations and compression}
+\TODO{Run experiment to see difference between optimisation and compression}
+\begin{table}[h]
+\centering
+\caption{Size comparison between raw and compressed snapshots saved to disk, varying in length.}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+           & 1min  & 1hr    & 24hr  & 7days\\ \hline
+raw        & 40MB  & 1.5GB  & 36GB  & 252GB\\ \hline
+optimised  &&&&\\ \hline     
+compressed & 1.6MB & 45.1MB & 1.1GB & 8GB\\ \hline
+\end{tabular}
+\label{tab:offline-storage}
+\end{table}
+% 7 252GB 8GB
+% 10mins 30mins   47mins
+% r 272.4MB 834MB 1.25GB
+% c 8MB 24.5MB    36.5MB
 % subsubsection compression (end)
+
+\subsection{Enabling long-term recordings} % (fold)
+\label{sub:enabling_long_term_recordings}
 
 \subsubsection{Chunked compression} % (fold)
 \label{sub:chunked_compression}
-
+\TODO{Describe chunking concept, use of chunks to reduce in memory size of recording}
+\begin{figure}[ht]
+\centering
+  \includegraphics[width=0.75\textwidth]{img/DejaVuCompression.pdf}
+  \caption{Segmented compression scheme employed by DejaVu to reduce in-memory usage.}
+  \label{fig:compression}
+\end{figure}
+% subsubsection chunked_compression (end)
+% subsection enabling_long_term_recordings (end)
 \section{Full Time Control} % (fold)
 \label{sec:full_time_control}
-
+asdasd
 % section full_time_control (end)
-% subsubsection chunked_compression (end)
 
 % section diffing_two_cps_visually (end)
 \section{Accessing Long-term simulations} % (fold)
