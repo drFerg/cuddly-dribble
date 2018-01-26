@@ -72,9 +72,15 @@ A non-exhaustive list of visual diffing techniques commonly used include:
 
 % subsubsection techniques (end)
 
+\section{Implementing Visual Diffing} % (fold)
+\label{sec:implementing_visual_diffing}
+Visual diffing utilises the recording framework described in section \ref{sec:recording}. The simulator supports visual diffing a live simulation against a recorded replay or two recorded replays. When visual diffing is enabled, the simulator generates duplicate ``ghost'' entities corresponding to the entities in the replay. In order for the visual diffing to work, these ``ghost'' entities must have a corresponding ``live'' entity, so that a diff can be applied, linked via id tokens. These ``ghost'' entities don't physically interact with the live simulation, simply replaying what was originally recorded. As the live simulation is run the simulation time progresses; at each simulation tick the replay time updated and any snapshots that need to be applied are applied to the ``ghost'' entities.
+% section implementing_visual_diffing (end)
+
+
 \section{Recording and Time Control}
 \label{sec:recording}
-Recording CPS tests in real-world deployments is a difficult and time-consuming task, requiring not only recording and retrieving logs from a network of devices, but also video recording environments when physical phenomena are involved, such as people interacting with the system. Recording in the real-world is a ``one-shot'' chance, where anything missed, due to not being recorded in a log or within the video frame, can't be retrieved, requiring either guesstimating or a test re-run. Recording large volumes of data on-device may not be possible due to the constrained hardware, similarly, the network bandwidth may not support such data either, not without having adverse affects on the rest of the CPS. 
+Running and recording CPS tests in real-world deployments is a difficult and time-consuming task, requiring not only recording and retrieving logs from a network of devices, but also video recording environments when physical phenomena are involved, such as people interacting with the system. Recording in the real-world is a ``one-shot'' chance, where anything missed, due to not being recorded in a log or within the video frame, can't be retrieved, requiring either guesstimating or a test re-run. Recording large volumes of data on-device may not be possible due to the constrained hardware, similarly, the network bandwidth may not support such data either, not without having adverse affects on the rest of the CPS. 
 
 Running simulations in a 3D virtual world opens up the opportunity for recording reconstruct-able replays, utilising data recorded from both the CPS simulation and from virtual world. Unlike other real-world or simulation recording approaches, these reconstructed replays allow viewers to see the cyber-physical cause and effect after-the-fact. Similarly, by recording at the simulation level, application code doesn't need to be edited to support it, ensuring application logic and control-flow consistency is guaranteed between testing and deployment.
 
@@ -118,14 +124,16 @@ At each time slice, a snapshot of an entity's state is stored as part of its his
 \end{table}
 % subsubsection raw (end)
 
-\subsubsection{Optimisations/Compression} % (fold)
+\subsubsection{Optimisations} % (fold)
 \label{sub:compressed}
 To reduce the amount of data recorded, instead of storing a snapshot of an entity at every tick (60FPS), we can instead store one only when some or all of its state has changed, thus saving considerable amount of space for entities which become inactive, physically or virtually; however, for simulations where all entities are active, the savings may be limited. 
 
 When using this technique, searching for specific time points becomes more difficult as there may not be a corresponding snapshot for an entity, instead the last recorded snapshot before the requested time point should be used.
 
-To further improve upon this, each snapshot only contains what has changed between time slices, starting from time t0. When rewinding or fast-fowarding through a continuous time period, these delta snapshots can be applied like before, only updating the changed state. However, providing random access to the history becomes more difficult, due to the snapshot containing only what has changed, if any snapshot exists at all for that time point. It's therefore necessary to start from t0 and apply each snapshot in turn until the requested time point is reached, O(n). Alternatively, at a set interval -- checkpoint, a full snapshot could be stored, enabling faster state restoring, O(n/m).
-\TODO{Discuss the use of state change optimisations and compression}
+To further improve upon this, each snapshot only contains what has changed between time slices, starting from time t0. When rewinding or fast-fowarding through a continuous time period, these delta snapshots can be applied like before, except updating only the changed state. 
+
+However, providing random access to the history becomes more difficult, due to the snapshot containing only what has changed, if any snapshot exists at all for that time point. To jump to time \textit{tn}, the simulator must start from t0 and apply each delta snapshot up to \textit{tn}, resulting in an O(n) time. Alternatively, at a set interval -- checkpoint, a full snapshot could be stored, enabling faster state restoring, requiring finding the nearest checkpoint to time \textit{tn}, before then applying each update until reaching \textit{tn}. This reduces the time to O(n/m), where m is the number of checkpoints, thus, a higher number of checkpoints reduces the search time, but will increase the storage consumption.
+
 \TODO{Run experiment to see difference between optimisation and compression}
 \begin{table}[h]
 \centering
@@ -134,7 +142,7 @@ To further improve upon this, each snapshot only contains what has changed betwe
 \hline
            & 1min  & 1hr    & 24hr  & 7days\\ \hline
 raw        & 40MB  & 1.5GB  & 36GB  & 252GB\\ \hline
-optimised  &&&&\\ \hline     
+optimised  &\textbf{TODO}&\textbf{TODO}&\textbf{TODO}&\textbf{TODO}\\ \hline     
 compressed & 1.6MB & 45.1MB & 1.1GB & 8GB\\ \hline
 \end{tabular}
 \label{tab:offline-storage}
@@ -147,10 +155,18 @@ compressed & 1.6MB & 45.1MB & 1.1GB & 8GB\\ \hline
 
 \subsection{Enabling long-term recordings} % (fold)
 \label{sub:enabling_long_term_recordings}
+Utilising optimisation and compression described previously builds the foundation for enabling long-term recordings to upwards of days and weeks without running out of memory. However, further optimisations are needed to provide efficient loading and viewing these recordings. Currently, when viewing a replay sequentially, the replay file can be streamed into memory, providing O(1) access to replay content. However, the current format doesn't support random access, requiring the whole replay to be loaded into memory up to the time point of interest, O(n) time, where n is the time point. This is not an optimal solution given replays can be in the order of hours to days. The rest of this section discusses two techniques employed to improve performance and usability when using long-term recordings.
 
-\subsubsection{Chunked compression} % (fold)
+\subsubsection{Replay Segmentation and Time-Shifting} % (fold)
 \label{sub:chunked_compression}
-\TODO{Describe chunking concept, use of chunks to reduce in memory size of recording}
+When replaying a long replay the system needs to sequentially load in the recording until the desired time-point is reached. This makes viewing small segments of hour/day/week long simulations inefficient. 
+
+To solve this, segmented compression is used. The continuous stream of snapshots both full and deltas, are divided into segments of a fixed size. Segments which are not currently being viewed are compressed and written to storage (disk or ssd). When running a replay the initial segment is loaded and the rest of the segments are set to lazy load in on-demand. This technique significantly reduces the memory requirements for recording and viewing long term recordings.
+
+Because of the optimisations used for storing snapshots, equal length time slices can contain significantly different numbers of snapshots, which would result in vastly different snapshot sizes e.g,. fixed 30sec snapshots: snapshot 1 contains 100 snapshots, whereas due to inactivity snapshot 2 and 3 contain only 20 snapshots each. This causes unpredictable loading performance and memory usage when accessing and de-compressing segments, with smaller segments loading quickly versus larger ones taking significantly longer and consuming considerably more space. Alternatively, storing fixed size segments ensures predictable memory usage and loading speed.
+
+To improve sequential and short-distance time-shifting performance pre-emptive segment loading is used i.e., segments before and after the current segment are loaded. This allows the user to jump forwards or backwards crossing into adjacent segments without causing significant slow downs. The number of pre-emptive segments loaded can be adjusted based on the available memory and performance requirements.
+
 \begin{figure}[ht]
 \centering
   \includegraphics[width=0.75\textwidth]{img/DejaVuCompression.pdf}
@@ -158,24 +174,22 @@ compressed & 1.6MB & 45.1MB & 1.1GB & 8GB\\ \hline
   \label{fig:compression}
 \end{figure}
 % subsubsection chunked_compression (end)
+
+\subsection{Finding Points-of-Interest} % (fold)
+\label{sub:indexing_points_of_interest}
+When reviewing long replays there are often periods of interest when certain activity or no activity may be occurring, but in order to find those interesting points users must watch the footage until they find that point in time, a time-consuming task which defeats the benefit of simulation being faster than real-time. Therefore, some form of automatic indexing of points-of-interest is necessary, enabling developers to instantaneously time-shift there without the need to search.
+
+To resolve this issue, we developed a set of built-in watcher functions which trigger point-of-interest checkpoints in the timeline. Developers can instruct the simulator to watch for certain attributes or events to occur e.g., watch for when node 1 receives a message, when a person is moving/stops moving.
+
+Ideally developers should be able to write functions which can access the event stream and then generate custom PoI checkpoints.
+% subsection indexing_points_of_interest (end)
 % subsection enabling_long_term_recordings (end)
 \section{Full Time Control} % (fold)
 \label{sec:full_time_control}
-asdasd
+
 % section full_time_control (end)
 
 % section diffing_two_cps_visually (end)
-\section{Accessing Long-term simulations} % (fold)
-\label{sec:indexing_long_term_simulations}
-\subsection{Scrobbling} % (fold)
-\label{sub:scrobbling}
-
-% subsection scrobbling (end)
-\subsection{Indexing Points-of-Interest} % (fold)
-\label{sub:indexing_points_of_interest}
-
-% subsection indexing_points_of_interest (end)
-% section indexing_long_term_simulations (end)
 \section{Case Study Analysis}
 \label{sec:Case Study Analysis}
 
