@@ -6,7 +6,7 @@ Testing a CPS in either simulation and the real-world typically involves recordi
 
 Processing log data manually is extremely time-consuming and only provides limited context given the amount of information a developer can read and process at one time. Utilising scripts or external analytical tools can provide more intuition about the data in significantly less time, however, results are provided off-line and outwith the context of the experiment.
 
-Testing in the virtual world provides developers with access to significantly larger volumes of data about a simulation than is possible to record from the real world, including information about entities in the world; combined with a fully customisable and controllable 3D world, this opens up the possibilities to more advanced analytics. 
+Testing in the virtual world provides developers with access to significantly larger volumes of data about a simulation than is possible to record from the real world, including information about entities in the world and the physical environment; combined with a fully customisable and controllable 3D world, this opens up the possibilities to more advanced and visually integrated analytical tools. 
 
 However, this benefit comes at a cost. Firstly, with such large volumes of data, at the rate of gigabytes per hour, how can developers process, analyse and make use of all the data in real-time, without resorting to reading and parsing logs? Secondly, using this data, how can developers visually compare and contrast two or more simulations, to identify differences when performing A-B testing?
 
@@ -32,10 +32,10 @@ Whilst not formally described as visual diffing in other domains, techniques whi
 	\label{fig:hawk_eye}
 }
 \hfill
-\subfloat[The Hawk-Eye system showing where all service shots for a player land within the court.]{
+\subfloat[The Hawk-Eye system showing the path a shot took, to help determine if it is at fault.]{
 	\centering
 	\includegraphics[width=0.49\textwidth]{img/hawk_eye_paths.jpg}
-	\label{fig:hawk_eye}
+	\label{fig:hawk_eye_path}
 }
 
 \subfloat[The Hawk-Eye system showing a heat map of player positions so far.]{
@@ -74,10 +74,63 @@ A non-exhaustive list of visual diffing techniques commonly used include:
 
 \section{Implementing Visual Diffing} % (fold)
 \label{sec:implementing_visual_diffing}
-Visual diffing utilises the recording framework described in section \ref{sec:recording}. The simulator supports visual diffing a live simulation against a recorded replay or two recorded replays. When visual diffing is enabled, the simulator generates duplicate ``ghost'' entities corresponding to the entities in the replay. In order for the visual diffing to work, these ``ghost'' entities must have a corresponding ``live'' entity, so that a diff can be applied, linked via id tokens. These ``ghost'' entities don't physically interact with the live simulation, simply replaying what was originally recorded. As the live simulation is run the simulation time progresses; at each simulation tick the replay time updated and any snapshots that need to be applied are applied to the ``ghost'' entities.
+Implementing visual diffing techniques utilises the recording framework described in section \ref{sec:recording}.
+
+\subsection{Ghosts} % (fold)
+\label{sub:ghosts}
+The ghost visual diffing technique is the simplest technique visually, making it possible to view two simulation replays simultaneously in the same environment, with one simulation's entities rendered as solids whilst the second's are ghosts, shown in figure \ref{fig:cps_diff}.
+
+\begin{figure*}[h]
+    \centering
+	\includegraphics[width=0.8\textwidth]{img/fireEvacCPS2.png}
+	\caption{CPS-enhanced evacuation diffed with non-enhanced ghosts. Evacuees are being directed to exits via safe routes.}
+	\label{fig:cps_diff}
+\end{figure*}
+% subsection ghosts (end)
+The simulator supports visual diffing a live simulation against a recorded replay, or one recorded replay against another. When visual diffing is enabled, the simulator creates ``ghost'' entities corresponding to the entities in the recorded repla,y which play out the recorded data from the replay. ``Ghost'' entities are not created for static objects in the environment, such as walls or floors - as these objects can't move.
+
+In order for the ``ghost'' visual diffing technique to work, ``ghost'' entities must have a corresponding ``live'' entity (from the simulation or corresponding replay), so that the diff can be observed. ``Ghost'' and ``live'' entities are linked via id tokens. ``Ghost'' entities don't physically interact with the live simulation, simply replaying what was originally recorded. As the live simulation is run the the simulation time ticks at 60FPS; at each simulation tick the replay time updated and any snapshots that need to be applied are applied to the ``ghost'' entities.
+
+
+
 % section implementing_visual_diffing (end)
+\subsection{Paths} % (fold)
+\label{sub:paths}
+The path visual diffing technique displays the movement history of a entity as it traverses through the environment, leaving behind a trail consisting of lines and spheres, shown in figure \ref{fig:path_navigation_diff}.
+
+Paths are generated in real-time from a recording, starting from time \textit{t0}, a time sphere is created for each movable entity. New spheres are created at 1-second intervals, to reduce the granularity and provide visual time-step clues, joined by a line. Using this combination of spheres and lines provides a visual path of where an entity has been and the rate at which they were travelling. This makes it trivial to observe movement patterns and changes between different simulation runs.
+
+For fast moving entities, it is possible decrease the interval time to increase the path granularity, displaying smoother paths through the environment.
+
+The time spheres also provide a secondary time traversal function, time warping, described in section \ref{sub:time_spheres}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/fireevacghost.png}
+	\caption{A person evacuating chooses two different paths in different runs based on CPS assistance, the ghost shows the same person taking a different route in a previous run.}
+	\label{fig:path_navigation_diff}
+\end{figure}
+% subsection paths (end)
+
+\subsection{Time Warping} % (fold)
+\label{sub:time_spheres}
+Time Spheres provide a secondary time traversal tool for visual diffing, time-warping. Within the virtual world times spheres are interactive, allowing observers to click on them to instantly time-warp between different time points. 
+
+As time spheres are generated they contain a reference to the time point at which they were created. Using this time point reference, the simulator can find and load the appropriate snapshot, resetting the environment to that snapshot's state. When this happens, the paths and time spheres remain, allowing for observers to time warp back and forth between time points.
+
+% subsection time_spheres (end)
+\subsection{Colour and Size} % (fold)
+\label{sub:colour_and_size}
+Ghosts and path visual diffing techniques support visualising spatial differences between entities, making it simple to spot differences over time or between simulations. However, visual diffing of internal state or non-visual data requires more creative visual techniques, such as colour and size.
 
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/biggerSensorAlert.png}
+	\caption{One of the sensors is red in colour and enlarged, representing a change in state when diffed to another run.}
+	\label{fig:diff_colour size}
+\end{figure}
+% subsection colour_and_size (end)
 \section{Recording and Time Control}
 \label{sec:recording}
 Running and recording CPS tests in real-world deployments is a difficult and time-consuming task, requiring not only recording and retrieving logs from a network of devices, but also video recording environments when physical phenomena are involved, such as people interacting with the system. Recording in the real-world is a ``one-shot'' chance, where anything missed, due to not being recorded in a log or within the video frame, can't be retrieved, requiring either guesstimating or a test re-run. Recording large volumes of data on-device may not be possible due to the constrained hardware, similarly, the network bandwidth may not support such data either, not without having adverse affects on the rest of the CPS. 
@@ -103,8 +156,9 @@ The following sections describe several optimisations and techniques used to imp
 \label{sub:raw}
 In order to record full reconstructions, the simulator needs to record both visible and non-visible behaviour i.e., both physical and internal state. Such data includes, position, rotation, trajectory, sensor data, transmission state, etc. By ensuring as much information as possible is stored, future reviews are able to view and process not just what developers thought might have been necessary when they ran the test. However, this extra information comes at a cost, as shown in figure \ref{tab:recording_costs}.
 
-At each time slice, a snapshot of an entity's state is stored as part of its history, in chronological order starting from time t0. Thus, in order to rewind to a previous state, the simulator simply sets the entity's state equal to the snapshot. For moving to a specific time point, the simulator uses the time stamp as an index to locate the correct snapshot, then simply sets the state to that.
+At each time slice, a snapshot of an entity's state is stored as part of its history, in chronological order starting from time \textit{t0}. Thus, in order to rewind to a previous state, the simulator simply sets the entity's state equal to the snapshot. For moving to a specific time point, the simulator uses the time stamp as an index to locate the correct snapshot, then simply sets the state to that.
 \sidenote{Revisit how it moves to a specific time point}
+
 \begin{table}
 	\centering
 	\caption{Recording costs of objects within the simulator}
@@ -130,9 +184,9 @@ To reduce the amount of data recorded, instead of storing a snapshot of an entit
 
 When using this technique, searching for specific time points becomes more difficult as there may not be a corresponding snapshot for an entity, instead the last recorded snapshot before the requested time point should be used.
 
-To further improve upon this, each snapshot only contains what has changed between time slices, starting from time t0. When rewinding or fast-fowarding through a continuous time period, these delta snapshots can be applied like before, except updating only the changed state. 
+To further improve upon this, each snapshot only contains what has changed between time slices, starting from time \textit{t0}. When rewinding or fast-fowarding through a continuous time period, these delta snapshots can be applied like before, except updating only the changed state. 
 
-However, providing random access to the history becomes more difficult, due to the snapshot containing only what has changed, if any snapshot exists at all for that time point. To jump to time \textit{tn}, the simulator must start from t0 and apply each delta snapshot up to \textit{tn}, resulting in an O(n) time. Alternatively, at a set interval -- checkpoint, a full snapshot could be stored, enabling faster state restoring, requiring finding the nearest checkpoint to time \textit{tn}, before then applying each update until reaching \textit{tn}. This reduces the time to O(n/m), where m is the number of checkpoints, thus, a higher number of checkpoints reduces the search time, but will increase the storage consumption.
+However, providing random access to the history becomes more difficult, due to the snapshot containing only what has changed, if any snapshot exists at all for that time point. To jump to time \textit{tn}, the simulator must start from \textit{t0} and apply each delta snapshot up to \textit{tn}, resulting in an O(n) time. Alternatively, at a set interval -- checkpoint, a full snapshot could be stored, enabling faster state restoring, requiring finding the nearest checkpoint to time \textit{tn}, before then applying each update until reaching \textit{tn}. This reduces the time to O(n/m), where m is the number of checkpoints, thus, a higher number of checkpoints reduces the search time, but will increase the storage consumption.
 
 \TODO{Run experiment to see difference between optimisation and compression}
 \begin{table}[h]
@@ -155,17 +209,25 @@ compressed & 1.6MB & 45.1MB & 1.1GB & 8GB\\ \hline
 
 \subsection{Enabling long-term recordings} % (fold)
 \label{sub:enabling_long_term_recordings}
-Utilising optimisation and compression described previously builds the foundation for enabling long-term recordings to upwards of days and weeks without running out of memory. However, further optimisations are needed to provide efficient loading and viewing these recordings. Currently, when viewing a replay sequentially, the replay file can be streamed into memory, providing O(1) access to replay content. However, the current format doesn't support random access, requiring the whole replay to be loaded into memory up to the time point of interest, O(n) time, where n is the time point. This is not an optimal solution given replays can be in the order of hours to days. The rest of this section discusses two techniques employed to improve performance and usability when using long-term recordings.
+With the current recording solution, even with the delta optimisation, it's possible to run out of memory within a few hours, if a given scene has many entities which are all very active, moving and changing state regularly. Therefore, to record, replay and analyse long-term CPS simulations consisting of days or weeks of content further improvements are needed to provide efficient loading, viewing and storing of these recordings. 
 
-\subsubsection{Replay Segmentation and Time-Shifting} % (fold)
+The rest of this section discusses several techniques employed to improve performance and usability when using long-term recordings.
+
+\subsubsection{Snapshot Chunking, Compression and Time-Shifting} % (fold)
 \label{sub:chunked_compression}
+Currently, when viewing a replay sequentially, the replay file can be streamed into memory, providing O(1) access to replay content. However, the current format doesn't support random access, requiring the whole replay to be loaded into memory up to the time point of interest, O(n) time, where n is the time point. This is not an optimal solution given replays can be in the order of hours to days.
+
 When replaying a long replay the system needs to sequentially load in the recording until the desired time-point is reached. This makes viewing small segments of hour/day/week long simulations inefficient. 
 
-To solve this, segmented compression is used. The continuous stream of snapshots both full and deltas, are divided into segments of a fixed size. Segments which are not currently being viewed are compressed and written to storage (disk or ssd). When running a replay the initial segment is loaded and the rest of the segments are set to lazy load in on-demand. This technique significantly reduces the memory requirements for recording and viewing long term recordings.
+To solve this, snapshot chunking is used. The continuous stream of snapshots both full and deltas, are divided into chunks or segments of a fixed size. Segments which are not currently being viewed are compressed and written to storage (disk or ssd). When running a replay the initial segment is loaded and the rest of the segments are set to lazy load in on-demand. This technique significantly reduces the memory requirements for recording and viewing long term recordings.
+
+Compression is used to significantly reduce the size of segments whilst on-disk. As segments are saved to or loaded from disk they are compressed or uncompressed, respectively. 
 
 Because of the optimisations used for storing snapshots, equal length time slices can contain significantly different numbers of snapshots, which would result in vastly different snapshot sizes e.g,. fixed 30sec snapshots: snapshot 1 contains 100 snapshots, whereas due to inactivity snapshot 2 and 3 contain only 20 snapshots each. This causes unpredictable loading performance and memory usage when accessing and de-compressing segments, with smaller segments loading quickly versus larger ones taking significantly longer and consuming considerably more space. Alternatively, storing fixed size segments ensures predictable memory usage and loading speed.
 
-To improve sequential and short-distance time-shifting performance pre-emptive segment loading is used i.e., segments before and after the current segment are loaded. This allows the user to jump forwards or backwards crossing into adjacent segments without causing significant slow downs. The number of pre-emptive segments loaded can be adjusted based on the available memory and performance requirements.
+Pre-emptive segment loading is used to improve sequential and short-distance time-shifting performance i.e., segments before and after the current segment are loaded. This allows the user to jump forwards or backwards crossing into adjacent segments without causing significant slow downs caused by waiting for segments to be loaded in from disk. The number of pre-emptive segments loaded can be adjusted based on the available memory and performance requirements.
+
+Utilising these techniques makes long-term recordings feasible, significantly reducing the space and time required to store, load and view recordings, from over a gigabyte for 1 hour to under 50 megabytes.  
 
 \begin{figure}[ht]
 \centering
@@ -175,14 +237,31 @@ To improve sequential and short-distance time-shifting performance pre-emptive s
 \end{figure}
 % subsubsection chunked_compression (end)
 
+
 \subsection{Finding Points-of-Interest} % (fold)
 \label{sub:indexing_points_of_interest}
-When reviewing long replays there are often periods of interest when certain activity or no activity may be occurring, but in order to find those interesting points users must watch the footage until they find that point in time, a time-consuming task which defeats the benefit of simulation being faster than real-time. Therefore, some form of automatic indexing of points-of-interest is necessary, enabling developers to instantaneously time-shift there without the need to search.
+Recording, storing and viewing long replays are made possible by the chunked compression recording scheme described above, however, generating this much replay content requires reviewing it too; when reviewing there are often periods of interest when certain activity or no activity may be occurring, but in order to find those interesting points users must watch the footage until they find that point in time, a time-consuming task which defeats the benefit of simulation being faster than real-time. Therefore, some form of automatic indexing of points-of-interest is necessary, enabling developers to instantaneously time-shift there without the need to search.
 
-To resolve this issue, we developed a set of built-in watcher functions which trigger point-of-interest checkpoints in the timeline. Developers can instruct the simulator to watch for certain attributes or events to occur e.g., watch for when node 1 receives a message, when a person is moving/stops moving.
+\subsection{Built-in PoI} % (fold)
+\label{sub:built_in_poi}
+
+% subsection built_in_poi (end)
+To resolve this issue, we developed a set of built-in listener functions which trigger point-of-interest checkpoints in the timeline when the event of interest occurs. Using this checkpoint developers can time-shift directly to it to see and understand what happened. Using these functions developers can instruct the simulator to watch for certain attributes or events to occur e.g., watch for when node 1 receives a message, when a person is moving/stops moving.
+
+These functions are set to run once per tick to access the necessary simulation data and determine if a condition has been met. These functions include checking: when a node transmits, when a node moves, when a nodes LED state changes, when a PIR sensor has been triggered.
 
 Ideally developers should be able to write functions which can access the event stream and then generate custom PoI checkpoints.
+
 % subsection indexing_points_of_interest (end)
+\subsubsection{Pub/Sub PoI} % (fold)
+\label{sub:pub_sub_poi}
+Because the framework is built upon a Pub/Sub message bus, it makes it possible for external tools to subscribe to the simulation event stream, perform stream processing and pattern match for events of interest. Using this developers can write custom event watchers without recompiling the simulator code.
+
+To make this work the simulation components publish world and simulation events to the message bus, to which external components can subscribe. The simulator also subscribes to the PoI stream; when a developer's event listener finds a match it can then publish the timestamp and event name to the PoI stream; when received by the simulation component, it records this PoI checkpoint for later playback.
+
+Utilising this Pub/Sub architectural approach decouples developers from the simulator codebase and language, enabling developers to write custom scripts/tools in larger number of languages and tools.
+% subsection pub_sub_poi (end)
+
 % subsection enabling_long_term_recordings (end)
 \section{Full Time Control} % (fold)
 \label{sec:full_time_control}

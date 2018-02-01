@@ -9,16 +9,21 @@ Testing and understanding how the environment interacts with a sensor network an
 % In the following section we describe in detail our novel 3D simulation platform, Ard\'{a}n, discussing the various features and tools it provides. Section 2 discusses the requirements which we believe to be vital for 3D simulation platform development. Section 3 describes the design and architecture of Ard\'{a}n, followed by an example case study for testing and deployment in section 4. We subsequently present a performance evaluation and discuss the challenges involved in developing the Ard\'{a}n platform, in sections 5 and 6 respectively.
 \section{Problem} % (fold)
 \label{sec:problem}
-Discuss how existing tools/simulators don't focus on simulating the environment, instead focussing on accurate hardware/software simulation. 
+Cyber-physical systems are deployed in physical environments, interacting with the surrounding physical infrastructure to provide services for nearby inhabitants, such as heating, lighting, security, fire and environmental safety. However, existing simulation tools and techniques used to develop, test and analyse such systems don't consider the physical environment, its inhabitants and their mobility. 
+ 
 Existing approaches for testing CPS focus heavily on accurately simulating devices, the network and power consumption, with great success \cite{cooja, tossim}.
-These tools and techniques don't support reliably, comprehensively and dynamically testing these devices in the context of their target environment and the phenomena which may occur within it. Typically, the environment fed into simulations using recorded sensor traces or fabricated based on a developers model and needs. These traces:
+These tools and techniques don't support reliably, comprehensively and dynamically testing these devices in the context of their target environment and the phenomena which may occur within it. Typically, the environment data is fed into simulations using recorded sensor traces or fabricated based on a developer's testing model and needs. These traces suffer from several issues:
 \begin{itemize}
-  \item static - recorded traces are taken from fixed positions, can be modified but is time consuming and un-reliable
+  \item static - recorded traces are taken from fixed positions, can be modified but is time consuming and un-reliable.
   \item reliability - fabricated traces are based on a developers model of an environment and may not accurately represent it or all of it.
-  \item comprehensive - traces are time consuming to create and must be created ahead of time
+  \item comprehensive - traces are time consuming to create and must be created ahead of time.
+  \item scalability - updating traces when new devices are added or the scenario changes becomes unmanageable for even small networks, <10 devices.
 \end{itemize}
 
-performed using recorded or designed sensor trace data. This approach can be inaccurate, unrealistic and is restricted to what was recorded.
+Gelenbe et al.\cite{}
+
+In the remainder of this chapter we describe the new co-simulation platform, based on the framework described in chapter \ref{chap:framework}, which focuses on enabling CPS simulation within its target environment, utilising a dynamic virtual world. 
+
 
 % section problem (end)
 \section{Design}
@@ -26,14 +31,14 @@ performed using recorded or designed sensor trace data. This approach can be ina
 
 The WSN simulator (Cooja), performs all application and network simulation for the co-simulation and is configured with a set of nodes with their 3D location and application code to run. As the application code is run in real-time, any sensor- or actuator-based hardware requests, such as sensor reads and actuator commands, are forwarded to the 3D game engine to be performed in the virtual environment.
 
-Within the Unreal Engine we modeled a 3D environment and created a several components to support deploying virtual sensor networks, including device and sensor 3D models, hardware abstractions for the virtual sensors and actuators to sense the virtual world and report back to the simulator over the network bus. Similarly within the Cooja simulator we have modified the simulated hardware to communicate to our virtual hardware in the Unreal Engine.
+Within the Unreal Engine we modelled a 3D environment and created a several components to support deploying virtual sensor networks, including device and sensor 3D models, hardware abstractions for the virtual sensors and actuators to sense the virtual world and report back to the simulator over the network bus. Similarly within the Cooja simulator we have modified the simulated hardware to communicate to our virtual hardware in the Unreal Engine.
 
 Using Cooja, developers are able to write code once and both test in Ard\'{a}n and deploy in the real-world on the Contiki or TinyOS platform, removing difficulties associated with translating between test and deployment platforms. Using the open architecture, support for additional tools and simulation platforms can also be added, expanding the possibilities and improving the fidelity of simulations.
 
 \section{Phenomena-on-demand} % (fold)
 \label{sec:phenomena_on_demand}
 Unlike existing approaches which utilise purely trace-fed and scripted approaches which are static and difficult to modify, this simulator enables dynamic phenomena generation based on the user input or scripted behaviour. 
-By taking direct control of devices or people within the environment, developers can iteract with and modify the simulation directly and observe how the dynamic simulation responds. This differs to trace-fed alternatives which require developers to manually change the input to sensors based on how they believe the environment has changed. 
+By taking direct control of devices or people within the environment, developers can interact with and modify the simulation directly and observe how the dynamic simulation responds. This differs to trace-fed alternatives which require developers to manually change the input to sensors based on how they believe the environment has changed. 
 
 For example, two sensors are placed within a school corridor to detect the pace of people walking past; the sensors communicate and calculate the walker's pace, displaying a red light to people running. In a trace-fed scenario, developers script sensor detection inputs to the two nodes. Developers may generate a test case for different speed walkers or multiple walkers. For each test case, the developers need to manually calculate and modify each trace-feed for each sensor individually. For our approach, developers need only change the speed of a person walking and observe the effects on the system. This approach provides a much more intuitive and scalable solution to testing with large numbers of devices and as the number of input sensors increase, in which trace-fed solutions become unmaintainable.  
 % section phenomena_on_demand (end)
