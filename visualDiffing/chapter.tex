@@ -179,13 +179,13 @@ At each time slice, a snapshot of an entity's state is stored as part of its his
 \end{table}
 % subsubsection raw (end)
 
-\subsubsection{Optimisations} % (fold)
+\subsubsection{Delta Optimisation and Checkpoints} % (fold)
 \label{sub:compressed}
 To reduce the amount of data recorded, instead of storing a snapshot of an entity at every tick (60FPS), we can instead store one only when some or all of its state has changed, thus saving considerable amount of space for entities which become inactive, physically or virtually; however, for simulations where all entities are active, the savings may be limited. 
 
 When using this technique, searching for specific time points becomes more difficult as there may not be a corresponding snapshot for an entity, instead the last recorded snapshot before the requested time point should be used.
 
-To further improve upon this, each snapshot only contains what has changed between time slices, starting from time \textit{t0}. When rewinding or fast-fowarding through a continuous time period, these delta snapshots can be applied like before, except updating only the changed state. 
+To further improve upon this, each snapshot only contains what has changed between time slices, starting from time \textit{t0}. When rewinding or fast-forwarding through a continuous time period, these delta snapshots can be applied like before, except updating only the changed state. 
 
 However, providing random access to the history becomes more difficult, due to the snapshot containing only what has changed, if any snapshot exists at all for that time point. To jump to time \textit{tn}, the simulator must start from \textit{t0} and apply each delta snapshot up to \textit{tn}, resulting in an O(n) time. Alternatively, at a set interval -- checkpoint, a full snapshot could be stored, enabling faster state restoring, requiring finding the nearest checkpoint to time \textit{tn}, before then applying each update until reaching \textit{tn}. This reduces the time to O(n/m), where m is the number of checkpoints, thus, a higher number of checkpoints reduces the search time, but will increase the storage consumption.
 
@@ -246,12 +246,12 @@ Recording, storing and viewing long replays are made possible by the chunked com
 \subsection{Built-in PoI} % (fold)
 \label{sub:built_in_poi}
 
-% subsection built_in_poi (end)
 To resolve this issue, we developed a set of built-in listener functions which trigger point-of-interest checkpoints in the timeline when the event of interest occurs. Using this checkpoint developers can time-shift directly to it to see and understand what happened. Using these functions developers can instruct the simulator to watch for certain attributes or events to occur e.g., watch for when node 1 receives a message, when a person is moving/stops moving.
 
 These functions are set to run once per tick to access the necessary simulation data and determine if a condition has been met. These functions include checking: when a node transmits, when a node moves, when a nodes LED state changes, when a PIR sensor has been triggered.
 
 Ideally developers should be able to write functions which can access the event stream and then generate custom PoI checkpoints.
+% subsection built_in_poi (end)
 
 % subsection indexing_points_of_interest (end)
 \subsubsection{Pub/Sub PoI} % (fold)
@@ -270,8 +270,42 @@ Utilising this Pub/Sub architectural approach decouples developers from the simu
 % section full_time_control (end)
 
 % section diffing_two_cps_visually (end)
-\section{Case Study Analysis}
-\label{sec:Case Study Analysis}
+\section{Case Study}
+\label{sec:case_study}
+To demonstrate the visual diffing tools we developed a case study, deploying a cyber-physical-enhanced fire detection and evacuation system. This CPS caters for large buildings with multiple corridors and exit routes, such as offices or shopping malls, in which finding the safest route out is non-trivial.
+
+Previous work by \cite{doi:10.1093/comjnl/bxq012,7152824} has demonstrated the use and benefit of utilising a 2D evacuation simulator to develop new cyber-physical systems to enhance detection and evacuation, ensuring people are directed away from high-risk areas, reducing congestion at critical paths and providing detailed information for emergency crew to locate areas of high-interest. 
+
+Our case study utilises the algorithm from this approach, to provide a walk-through of, demonstrate and evaluate the visual diffing techniques and time control features, such as time-warping and checkpoints.
+
+\begin{figure}[bht]
+\begin{lstlisting}[style=CPSCAL]
+broadcast msg {ID, dist}
+select:
+  waiton msg {ID, dist}:
+    routes[ID] = dist + 1
+    effectiveDist = min(dist+1, effectiveDist)
+    if changed:
+      broadcast msg {ID, effectiveDist}
+  waiton msg {ID, FIRE}:
+    routes[ID] = FIRE
+    effectiveDist = min_hazard(routes)
+    broadcast msg {ID, effectiveDist}
+  waiton sensor {FIRE}:
+    broadcast msg {ID, FIRE}
+\end{lstlisting}
+\caption{Pseudo-code for distributed evacuation CPS}
+\label{code:algo}
+\end{figure}
+
+The algorithm, shown in pseudo-code form in figure \ref{code:algo}, runs on each node within the network. Each node first broadcasts its distance to an exit; upon receiving a distance message, a node recalculates its shortest path to an exit; upon receiving a fire message, a node removes the senders path and recalculates the shortest distance to an exit taking into consideration the distance to the closest exit via a path and that path's hazard risk based on its distance to the nearest hazard; lastly, if a node receives a fire message from its own sensor, it broadcasts the fire alert to the rest of the network. Each node knows the direction of its nearest neighbours at deployment time, thus, using light indicators, observers can be directed along the calculated safe routes.
+
+Using DejaVu, we interactively programmed the evacuation system, testing and debugging our initial distributed navigation algorithm using virtual agents to react to virtual emergency fire evacuations.
+Using the replay and diff features, we were able to observe the differences that occur between different runs of the evacuation. For our analysis we focused on observing evacuation navigation between simulation runs, i.e., agent movement in reaction to the algorithm direction. Further examples of DejaVu's diffing capabilities are show in the appendix.
+
+Upon adapting the fire evacuation algorithm, we are able to use DejaVu to visually observe how it affects evacuation navigation. Before using the algorithm, evacuees would simply navigate to the exit closest to them, signposted by static exit signs, as shown in figure \ref{fig:navigation_no_CPS}, unless they encounter a fire. When the CPS is deployed, shown in figure \ref{fig:cps_diff}, evacuees are guided to the nearest safe exit, which may be longer than the shortest route, because of a fire hazard en route. Using DejaVu, the difference between these two scenarios is clear, in which the unaided scenario can be seen played out by the ghosts, whilst the current CPS-enhanced scenario avoids directing people towards the fire, using dynamic floor signs - pointing the people towards the safe route.
+
+Sensors can also be seen as white cuboids mounted along the corridor walls in figure \ref{fig:cps_diff}, detecting fire and relaying information between themselves according to the algorithm. The double coloured circles and lines signify radio traffic from one node to another, whilst the smaller coloured rings and LEDs reflect the status LEDS the node; these visual overlays expose more information typically hidden from sight in the real-world.
 
 \section{Evaluation}
 \label{sec:Evaluation}

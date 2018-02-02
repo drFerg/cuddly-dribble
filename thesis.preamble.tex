@@ -145,3 +145,24 @@
 \newcommand{\openquestion}[1]{
  \par\noindent{\sffamily\textbf{OPEN QUESTION}~$\blacktriangleright$~{\textcolor{orange}{#1}}}
 }
+
+% Used for visual diffing chapter, for code example
+\usepackage{listings}
+\lstset{numbers=left,xleftmargin=2em}
+\lstdefinestyle{CPSCAL}
+{ %Formatting for code in appendix
+    language=Java,
+    columns=flexible,
+    basicstyle=\footnotesize\ttfamily,
+    numbers=left,
+    numbersep=5pt,
+    stepnumber=1,
+    showspaces=false,
+    keepspaces=false,
+    showstringspaces=false,
+    tabsize=2,
+    breaklines=true,
+    breakatwhitespace=true,
+    morekeywords={algorithm,either,send,receive,select,on,bind,model,process,waiton,broadcast},
+    deletekeywords={id},
+}
