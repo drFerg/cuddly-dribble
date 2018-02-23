@@ -270,8 +270,15 @@ Utilising this Pub/Sub architectural approach decouples developers from the simu
 % section full_time_control (end)
 
 % section diffing_two_cps_visually (end)
-\section{Case Study}
-\label{sec:case_study}
+\section{Using Visual Diffing} % (fold)
+\label{sec:using_visual_diffing}
+To demonstrate the visual diffing techniques implemented and described above, we created a case study for which we developed and tested a CPS application using these visual diffing techniques. 
+
+The remainder of this section first describes the case study and the related background, followed by a visual walk-through of using the visual diffing tools to test and analyse specific elements of the virtually deployed system.
+
+% section using_visual_diffing (end)
+\subsection{Case Study: Fire Evacuation}
+\label{ssec:case_study}
 To demonstrate the visual diffing tools we developed a case study, deploying a cyber-physical-enhanced fire detection and evacuation system. This CPS caters for large buildings with multiple corridors and exit routes, such as offices or shopping malls, in which finding the safest route out is non-trivial.
 
 Previous work by \cite{doi:10.1093/comjnl/bxq012,7152824} has demonstrated the use and benefit of utilising a 2D evacuation simulator to develop new cyber-physical systems to enhance detection and evacuation, ensuring people are directed away from high-risk areas, reducing congestion at critical paths and providing detailed information for emergency crew to locate areas of high-interest. 
@@ -298,7 +305,7 @@ select:
 \label{code:algo}
 \end{figure}
 
-The algorithm, shown in pseudo-code form in figure \ref{code:algo}, runs on each node within the network. Each node first broadcasts its distance to an exit; upon receiving a distance message, a node recalculates its shortest path to an exit; upon receiving a fire message, a node removes the senders path and recalculates the shortest distance to an exit taking into consideration the distance to the closest exit via a path and that path's hazard risk based on its distance to the nearest hazard; lastly, if a node receives a fire message from its own sensor, it broadcasts the fire alert to the rest of the network. Each node knows the direction of its nearest neighbours at deployment time, thus, using light indicators, observers can be directed along the calculated safe routes.
+The same algorithm runs on each node within the network, shown in pseudo-code form in figure \ref{code:algo}. Each node first broadcasts its distance to an exit; upon receiving a distance message, a node recalculates its shortest path to an exit; upon receiving a fire message, a node removes the senders path and recalculates the shortest distance to an exit taking into consideration the distance to the closest exit via a path and that path's hazard risk based on its distance to the nearest hazard; lastly, if a node receives a fire message from its own sensor, it broadcasts the fire alert to the rest of the network. Each node knows the direction of its nearest neighbours at deployment time, thus, using light indicators, observers can be directed along the calculated safe routes.
 
 Using DejaVu, we interactively programmed the evacuation system, testing and debugging our initial distributed navigation algorithm using virtual agents to react to virtual emergency fire evacuations.
 Using the replay and diff features, we were able to observe the differences that occur between different runs of the evacuation. For our analysis we focused on observing evacuation navigation between simulation runs, i.e., agent movement in reaction to the algorithm direction. Further examples of DejaVu's diffing capabilities are show in the appendix.
