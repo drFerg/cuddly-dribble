@@ -3,14 +3,13 @@
 \label{chap:Case Study}
 \section{Introduction}
 \label{sec:Introduction}
-Describe the case study which will be used throughout the thesis to demonstrate old methods vs new methods.
-
+To aid this thesis, two case studies are presented below, describing the use of an indoor CPS to improve a particular service for users of the building.
 \section{Energy Efficient Corridor Lighting}
 Lighting left on in our schools, universities and offices wastes not only millions of pounds a year but increases our carbon footprint, with an average\footnotemark office lit overnight consuming that equal to the energy needed to boil over a 1,000 cups of tea\cite{cambridgeEnergyWaste,carbonTrustEnergyWaste}. 
 
-To tackle this, the use of smart / intelligent lighting can decrease the amount of energy wasted during off peak times, such as evenings and weekends, when few people are around. Similarly, we can also decrease wastage during summer periods, for offices in which bright sunlight is available. Socially, using automatic lighting prevents issues regarding lighting control over large office spaces, in which there may only be a single main control, where social pressure may prevent a single person from turning off uneeded lights over a shared-space.
+To tackle this, the use of smart / intelligent lighting can decrease the amount of energy wasted during off peak times, such as evenings and weekends, when few people are around. Similarly, we can also decrease wastage during summer periods, for offices in which bright sunlight is available. Socially, using automatic lighting prevents issues regarding lighting control over large office spaces, in which there may only be a single main control, where social pressure may prevent a single person from turning off unneeded lights over a shared-space.
 
-Deploying and testing a scheme such as this is a costly and risky challenge, with budget concerns, safety regulations and any on-peak downtime or faults can be costly to businesses or public buildings. On top of this many different technical concerns which would need to be addressed, including, where to place sensors, algorithm robustness/performance, lighting comfort, to name a few. Thus, thorough testing is absolutely required, but, testing in the real-world is limited by the aformentioned concerns. 
+Deploying and testing a scheme such as this is a costly and risky challenge, with budget concerns, safety regulations and any on-peak downtime or faults can be costly to businesses or public buildings. On top of this many different technical concerns which would need to be addressed, including, where to place sensors, algorithm robustness/performance, lighting comfort, to name a few. Thus, thorough testing is absolutely required, but, testing in the real-world is limited by the aforementioned concerns. 
 
 
 \footnotetext{Based on a typical office space of 100m2 with 18 x 6ft (1800mm) T8 tubes at 70W each.}
@@ -23,15 +22,31 @@ Test scenarios focus on the period of off-peak office usage in which minimal lig
 
 \subsection{People}
 \label{subsec:People}
-Office-based participants typically occupy there personal office spaces with
+Office-based participants typically occupy there personal office spaces, occasionally traversing between rooms for meetings, lunch, walks or toilet breaks.
+
 \subsection{Sensors + Actuators}
 \label{subsec:Sensors + Actuators}
-For sensing office users we could utilise several different sensing technologies, at various abstracts.
+
+In order for the CPS to balance energy reduction goals and comfort levels, sensing technology must be used to detect the presence of people; two main sensor types could be considered, people sensors and light sensors.
+
+Within the real-world we are limited by the technology available today and the limititations individual sensing technologies provide. Sensing presence within an indoor environment falls into three main categories.
+
 \begin{itemize}
-  \item Person detection
-  \item Motion/PIR Sensors
-  \item BLE/WiFi (Range)
+  \item Person identification - Camera, RFID tag, WiFi/BLE
+  \item Presence detection - PIR
+  \item Movement detection - Motion sensors
 \end{itemize}
+
+Person identification - Enables a CPS to identify and recognise individual participants, with varying levels of spatial accuracy e.g., cameras can detect position based within their field of view, RFID tags are effective at detecting presence in areas in which entry/exit requires scanning a tag, WiFi/Bluetooth provide identification based on a user device within range of the sensor.
+
+Presence detection - Enables a CPS to detect the presence of people within an area, typically a wide-range PIR sensor, via the use of thermal detection. Typically not able to differentiate between 1 or more people. Able to capture presence in relatively non-active environments, e.g., people sitting at desks typing.
+
+Movement detection - Can detect simply the movement of people within a space, typically detects walking and running.
+
+Depending on the location type, corridor or office, different sensors may be more appropriate. Utilising a presence or person sensor within an office may work effectively where movement may not be as large or consistent, in which people may be stationary or seated for pro-longed periods of time. On the other-hand, in a corridor, movement detection (motion sensors) would be accurate enough for passerbys.
+
+Within a 3D game engine the sensing method can be abstract, not limited by a specific technology or sensor type, enabling the CPS to detect the presence of people at varying levels of granularity, i.e., person identification, person presence detection, movement detection. 
+
 \section{Fire Evacuation using Distributed Navigation}
 Fire evacuation design and planning is a key part of all public buildings, including schools, offices and hospitals, in which ensuring there is a prescribed fire evacuation plan in place, with safe and clearly marked routes to urgently egress a building in the event of a fire or other emergency. 
 
@@ -39,14 +54,20 @@ As part of building regulations \cite{fireLegislation}, architects and building 
 
 However, there are a variety of issues with the current signage approach. In the event of an emergency research has shown people often ignore emergency exit signs and instead attempt to egress via the point they ingress the building. This can often not be the fastest route, both due to distance and the additional congestion on this route caused by many people acting similarly. In the case of a fire en-route to the nearest signposted exit, it may not be possible to determine the safest route to without additional knowledge.
 
-This case study focuses on demonstrating a CPS-enhanced improvement to these signs.
+This case study focuses on demonstrating a CPS-enhanced improvement to these signs; the concept involves deploying a CPS-ehanced signage, which dynamically calculates safe routes to aide evacuees in navigating along safe evacuation routes during a fire alert. The CPS will take a distributed approach to determining a safe route, without the use of global maps or centralised decision nodes. Instead nodes will rely on only local layout knowledge and must determine safe routes through dissemination of locally safe paths.
 
-
-This case study focuses on the concept of a deploying a CPS to aide in navigating a safe evacuation route during a fire alert. The CPS will take a distributed approach to determining a safe route, without the use of global maps or centralised decision nodes. Instead nodes will rely on only local layout knowledge and must determine safe routes through dissemination of locally safe paths.
 
 \subsection{Layout}
 Nodes will be placed along corridors, doorways and/or rooms equipped with fire detectors (smoke, heat, etc). Nodes will also be equipped with directional indicators to designate safe routes to an exit. Nodes can be of two types, a pathway node, or exit node. Exit nodes are placed adjacent to fire escape routes, such as stairwells, or exiting doors.
-
+\subsection{Sensors + Actuators}
+\label{subsec:Sensors + Actuators}
+In order for the CPS to help evacuess navigate safer routes towards an exit, the CPS needs to be able to sense where a source of danger is (i.e., fire). Utilising the game engine
+For sensing office users we could utilise several different sensing technologies, at various abstracts.
+\begin{itemize}
+  \item Person detection
+  \item Motion/PIR Sensors
+  \item BLE/WiFi (Range)
+\end{itemize}
 \subsection{Invariants}
 \begin{itemize}
   \item No node should direct towards fire.
@@ -54,7 +75,7 @@ Nodes will be placed along corridors, doorways and/or rooms equipped with fire d
   \item Exits near fire should be avoided.
 \end{itemize}
 
-\subsection{Algorithm design}
+\subsection{Evacuation Algorithm}
 \begin{verbatim}
 for(;;) {
   wait_on_event();
