@@ -3,79 +3,112 @@
 \label{chap:Case Study}
 \section{Introduction}
 \label{sec:Introduction}
-To aid this thesis, two case studies are presented below, describing the use of an indoor CPS to improve a particular service for users of the building.
-\section{Energy Efficient Corridor Lighting}
-Lighting left on in our schools, universities and offices wastes not only millions of pounds a year but increases our carbon footprint, with an average\footnotemark office lit overnight consuming that equal to the energy needed to boil over a 1,000 cups of tea\cite{cambridgeEnergyWaste,carbonTrustEnergyWaste}. 
+To aid this thesis, two case studies are presented below, describing the use of an indoor CPS to improve two services for users of the building; the first service targets reducing indoor lighting energy consumption, whilst the second provides dynamic navigation for emergency evacuation.
 
-To tackle this, the use of smart / intelligent lighting can decrease the amount of energy wasted during off peak times, such as evenings and weekends, when few people are around. Similarly, we can also decrease wastage during summer periods, for offices in which bright sunlight is available. Socially, using automatic lighting prevents issues regarding lighting control over large office spaces, in which there may only be a single main control, where social pressure may prevent a single person from turning off unneeded lights over a shared-space.
+\section{Energy Efficient Corridor Lighting}
+Lighting left on in our schools, universities and offices wastes not only millions of pounds a year but increases our carbon footprint, with an average\footnotemark office lit overnight consuming that equal to the energy needed to boil over a 1,000 cups of tea\cite{cambridgeEnergyWaste,carbonTrustEnergyWaste}.
+
+To tackle this, the use of smart / intelligent lighting can decrease the amount of energy wasted during off peak times, such as evenings and weekends, when few people occupy them. Similarly, we can also decrease wastage during summer periods, for offices in which bright sunlight is available. Socially, using automatic lighting prevents issues regarding lighting control over large office spaces, in which there may only be a single main control, where social pressure may prevent a single person from turning off unneeded lights over a shared-space.
 
 Deploying and testing a scheme such as this is a costly and risky challenge, with budget concerns, safety regulations and any on-peak downtime or faults can be costly to businesses or public buildings. On top of this many different technical concerns which would need to be addressed, including, where to place sensors, algorithm robustness/performance, lighting comfort, to name a few. Thus, thorough testing is absolutely required, but, testing in the real-world is limited by the aforementioned concerns. 
 
 
 \footnotetext{Based on a typical office space of 100m2 with 18 x 6ft (1800mm) T8 tubes at 70W each.}
 
+\subsection{Specification} % (fold)
+\label{sub:specification}
+The goal of the CPS lighting is to significantly reduce the out-of-hours lighting energy consumption while ensuring the remaining lighting left on is comfortable for any occupants still occupying the building. This can be achieved in two ways, for areas in which there are:
+
+
+\textbf{No occupants}, turn off lights completely in the area. For example, an empty office space or floor. As occupants move towards an unoccupied area, lights immediately around the detected occupant are gradually fully lit as they approach, whilst, more distant areas in line of sight are gradually lit. This ensures occupants are able to see around the area they occupy without the shock or distraction of lights flickering on and off.
+
+\textbf{Some occupants}, ensure lights around occupants are set to full/desired brightness, but reduce lighting intensity in the surrounding area. Exit routes, such as corridors, have reduced lighting but remain visibly lit, ensuring occupants feel aware of their surroundings and comfortable.
+
+To ensure the office spaces remain comfortable to work in, the lighting scheme must perform lighting changes in gradual steps: individual lights are always gradually turned on or off, never from completely off to completely on, or vice-versa, limiting the occupants to sudden and distracting changes in light; the light levels of neighbouring groups of lights nearby occupants gradually reduce relative to the distance from the occupants, reducing the energy consumption whilst ensuring occupants feel comfortable. 
+
+% subsubsection specification (end)
 \subsection{Environment}
 \label{subsec:Environment}
-This case study focuses on a typical closed-plan office space, with an array of rooms connected by several corridors. Lights are evenly distributed along corridors and within rooms. 
+This case study is based on a typical closed-plan office space, with an array of small rooms connected by several corridors. Rooms are shared by 4 occupants. Lights are evenly distributed along corridors and within rooms. 
 
-Test scenarios focus on the period of off-peak office usage in which minimal lighting is used, to reduce energy usage. Lighting can be assumed to be using dimmable LED lighting in which the colour and intensity can be adjusted instantaneously, unlike traditional flourescent tubes which can't be dimmed and typically have a 2-3 second delay before turning on (usually flickering). 
+Test scenarios focus on the period of off-peak office usage in which minimal lighting is used, to reduce energy usage. Lighting can be assumed to be using dimmable LED lighting in which the colour and intensity can be adjusted instantaneously, unlike traditional florescent tubes which can't be dimmed and typically have a 2-3 second delay before turning on (usually flickering). 
 
 \subsection{People}
 \label{subsec:People}
-Office-based participants typically occupy there personal office spaces, occasionally traversing between rooms for meetings, lunch, walks or toilet breaks.
+Office-based participants typically occupy their personal office spaces for prolonged periods of time (in the order of hours), occasionally traversing between rooms for meetings, lunch, walks or toilet breaks (in the order of tens of minutes).
+
 
 \subsection{Sensors + Actuators}
 \label{subsec:Sensors + Actuators}
 
-In order for the CPS to balance energy reduction goals and comfort levels, sensing technology must be used to detect the presence of people; two main sensor types could be considered, people sensors and light sensors.
+In order for the CPS to balance energy reduction goals and comfort levels, sensing technology must be used to detect the presence of people; two main sensor types could be considered, people sensors and light sensors. People sensors can be used to detect occupancy of spaces and indicate areas in which lighting can be reduced. Light sensors can be used to detect ambient light levels, to adjust lighting levels accordingly. This case study will focus on using only people sensors to alter light levels.
 
-Within the real-world we are limited by the technology available today and the limititations individual sensing technologies provide. Sensing presence within an indoor environment falls into three main categories.
+Within the real-world we are limited by the technology available today and the limitations individual sensing technologies provide. Sensing presence within an indoor environment can be divided into three main categories.
 
-\begin{itemize}
-  \item Person identification - Camera, RFID tag, WiFi/BLE
-  \item Presence detection - PIR
-  \item Movement detection - Motion sensors
-\end{itemize}
+% \begin{itemize}
+%   \item Person identification - Camera, RFID tag, WiFi/BLE
+%   \item Presence detection - PIR
+%   \item Movement detection - Motion sensors
+% \end{itemize}
 
-Person identification - Enables a CPS to identify and recognise individual participants, with varying levels of spatial accuracy e.g., cameras can detect position based within their field of view, RFID tags are effective at detecting presence in areas in which entry/exit requires scanning a tag, WiFi/Bluetooth provide identification based on a user device within range of the sensor.
+\textbf{Person identification} - Enables a CPS to identify and recognise individual participants, with varying levels of spatial accuracy e.g., cameras can detect position based within their field of view, RFID tags are effective at detecting presence in areas in which entry/exit requires scanning a tag, WiFi/Bluetooth provide identification based on a user device within range of the sensor.
 
-Presence detection - Enables a CPS to detect the presence of people within an area, typically a wide-range PIR sensor, via the use of thermal detection. Typically not able to differentiate between 1 or more people. Able to capture presence in relatively non-active environments, e.g., people sitting at desks typing.
+\textbf{Presence detection} - Enables a CPS to detect the presence of people within an area, typically a wide-range PIR sensor, via the use of thermal detection. Typically not able to differentiate between 1 or more people. Able to capture presence in relatively non-active environments, e.g., people sitting at desks typing.
 
-Movement detection - Can detect simply the movement of people within a space, typically detects walking and running.
+\textbf{Movement detection} - Can detect simply the movement of people within a space, typically detects walking and running.
 
-Depending on the location type, corridor or office, different sensors may be more appropriate. Utilising a presence or person sensor within an office may work effectively where movement may not be as large or consistent, in which people may be stationary or seated for pro-longed periods of time. On the other-hand, in a corridor, movement detection (motion sensors) would be accurate enough for passerbys.
+Depending on the location type, corridor or office, different sensors may be more appropriate. Utilising a presence or person sensor within an office may work effectively where movement may not be as large or consistent, in which people may be stationary or seated for pro-longed periods of time. On the other-hand, in a corridor, movement detection (motion sensors) would be accurate enough to detect passerbys.
 
-Within a 3D game engine the sensing method can be abstract, not limited by a specific technology or sensor type, enabling the CPS to detect the presence of people at varying levels of granularity, i.e., person identification, person presence detection, movement detection. 
+Within a 3D game engine the sensing method can be abstract, not limited by a specific technology or sensor type, enabling the CPS to detect the presence of people at varying levels of granularity, i.e., person identification, presence detection, movement detection.
+
+\subsection{Placement} % (fold)
+\label{sub:placement}
+A key concern when designing a system like this is ensuring consistent and reliable coverage of both occupant detection and the wireless network. If the occupancy detection fails in an area, due to a blind-spot or unreliable detection, this can lead to a poor user experience, leaving occupants in the dark. However, deploying too many sensors will result in redundant data and increased costs. Hence, testing placement within the target environment is absolutely necessary to mitigate the associated risks. 
+
+Sensors will be deployed in each room and along the corridor. Various sensors with different ranges can be tested, short range, long range, etc. Depending the on the sensor range, more or less sensors can be used, with differing placements to ensure complete coverage.
+% subsection placement (end)
+
+\subsection{Privacy Concerns} % (fold)
+\label{sub:privacy_concerns}
+The design of this lighting scheme proposes monitoring of the occupants' location within a building, knowledge of which is usually already available to building managers, typically via existing security infrastructure, such as CCTV or personal RFID entry cards. However, in buildings with outward facing windows and smaller, more personal offices, it may be possible to observe and determine the location of specific individuals externally. This case study does not focus on this concern.
+% subsection privacy_concerns (end)
 
 \section{Fire Evacuation using Distributed Navigation}
 Fire evacuation design and planning is a key part of all public buildings, including schools, offices and hospitals, in which ensuring there is a prescribed fire evacuation plan in place, with safe and clearly marked routes to urgently egress a building in the event of a fire or other emergency. 
 
-As part of building regulations \cite{fireLegislation}, architects and building managers must ensure there are adequate escape routes proportional to the size and capacity of a building. Escape routes must be clearly sign posted around the building, providing directions to the closest exit to a given point. These signs are typically printed or illuminated signs, providing only a single fixed direction towards an exit.
+As part of building regulations \cite{fireLegislation}, architects and building managers must ensure there are adequate escape routes proportional to the size and capacity of a building. Escape routes must be clearly sign posted around the building, providing directions to the closest exit at any given point. These signs are typically printed or illuminated signs, providing only a single fixed direction towards an exit.
 
-However, there are a variety of issues with the current signage approach. In the event of an emergency research has shown people often ignore emergency exit signs and instead attempt to egress via the point they ingress the building. This can often not be the fastest route, both due to distance and the additional congestion on this route caused by many people acting similarly. In the case of a fire en-route to the nearest signposted exit, it may not be possible to determine the safest route to without additional knowledge.
+However, there are a variety of issues with the current signage approach. In the event of an emergency research has shown people often ignore emergency exit signs and instead attempt to egress via the entrance they ingressed the building or via a familiar route \cite{Sime1983}. This is often not the fastest route, causing evacuees to travel a further distance to egress the building. Additionally, this behaviour has shown to cause significant congestion en-route and at the exit caused by a significant majority of people acting similarly. The herding effect can amplify this, with people ignoring logic and signs, instead following the herd\cite{Sime1983,Helbing}, which may be leading people in the wrong direction. In the case of a fire en-route to the nearest signposted exit, it may not be possible to determine the safest route to without additional knowledge.
 
-This case study focuses on demonstrating a CPS-enhanced improvement to these signs; the concept involves deploying a CPS-ehanced signage, which dynamically calculates safe routes to aide evacuees in navigating along safe evacuation routes during a fire alert. The CPS will take a distributed approach to determining a safe route, without the use of global maps or centralised decision nodes. Instead nodes will rely on only local layout knowledge and must determine safe routes through dissemination of locally safe paths.
+This case study focuses on demonstrating a CPS-enhanced improvement to these signs; the concept involves deploying a CPS-enhanced signage, which dynamically calculates safe routes to aide evacuees in navigating along safe evacuation routes during a fire alert. Safe routes are displayed along the floor and walls of the corridors.The CPS will take a distributed approach to determining a safe route, without the use of global maps or centralised decision nodes. Instead nodes will rely on only local layout knowledge and must determine safe routes through dissemination of locally safe paths.
 
 
 \subsection{Layout}
+\label{subsec:evac_cps_layout}
 Nodes will be placed along corridors, doorways and/or rooms equipped with fire detectors (smoke, heat, etc). Nodes will also be equipped with directional indicators to designate safe routes to an exit. Nodes can be of two types, a pathway node, or exit node. Exit nodes are placed adjacent to fire escape routes, such as stairwells, or exiting doors.
+
 \subsection{Sensors + Actuators}
 \label{subsec:Sensors + Actuators}
-In order for the CPS to help evacuess navigate safer routes towards an exit, the CPS needs to be able to sense where a source of danger is (i.e., fire). Utilising the game engine
-For sensing office users we could utilise several different sensing technologies, at various abstracts.
+In order for the CPS to help evacuees navigate safer routes towards an exit, the CPS needs to be able to sense where a source of danger is, such as fire. To further enhance the evacuation algorithm, the CPS could consider the congestion level along pathways and exits, preferring to direct evacuees along less congested, safe, but longer routes, relieving congestion at the problem area. 
+
+
+\subsection{Specification} % (fold)
+\label{sub:specification}
+The goal of the fire evacuation CPS is to dynamically calculate the shortest safe route to an exit, displaying this to an evacuee via a direction sign.
+
+Some basic invariants we want to ensure for such a system is:
 \begin{itemize}
-  \item Person detection
-  \item Motion/PIR Sensors
-  \item BLE/WiFi (Range)
-\end{itemize}
-\subsection{Invariants}
-\begin{itemize}
-  \item No node should direct towards fire.
+  \item No node should direct evacuees towards a fire.
   \item No two adjacent nodes should point towards one another.
   \item Exits near fire should be avoided.
 \end{itemize}
+The distributed dynamic evacuation navigation algorithm is not novel to this thesis, previously described by Gelenbe et al.\cite{6815220}.
+The CPS will be deployed as fire sensors throughout the corridors of a virtual office space, defined in section \ref{subsec:evac_cps_layout}.
+When a sensor detects fire, it broadcasts this to the network. Nodes which receive the message, blacklist the node's associated direction if it lies on a path to an exit, the message is forwarded on and subsequant nodes perform the same blacklisting action. Upon blacklisting, the node recalculates its shortest safe route, taking into consideration the blacklisted nodes and their proximity to the route.
 
-\subsection{Evacuation Algorithm}
+
+
+\begin{figure}[h]
 \begin{verbatim}
 for(;;) {
   wait_on_event();
@@ -95,3 +128,6 @@ for(;;) {
   }
 }
 \end{verbatim}
+\caption{Evacuation navigation psuedocode algorithm}
+\end{figure}
+% subsection specification (end)

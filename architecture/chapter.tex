@@ -12,21 +12,48 @@ Testing and understanding how the environment interacts with a sensor network an
 \label{sec:problem}
 Cyber-physical systems are deployed in physical environments, interacting with the surrounding physical infrastructure to provide services for nearby inhabitants, such as heating, lighting, security, fire and environmental safety. However, existing simulation tools and techniques used to develop, test and analyse such systems don't consider the physical environment, its inhabitants and their mobility. 
  
-Existing approaches for testing CPS focus heavily on accurately simulating devices, the network and power consumption, with great success \cite{cooja, tossim}.
-These tools and techniques don't support reliably, comprehensively and dynamically testing these devices in the context of their target environment and the phenomena which may occur within it. Typically, the environment data is fed into simulations using recorded sensor traces or fabricated based on a developer's testing model and needs. These traces suffer from several issues:
+Existing approaches for testing CPS focus heavily on accurately simulating devices, the network and power consumption, with great success \cite{cooja, tossim}. These tools and techniques don't support reliably, comprehensively and dynamically testing these devices in the context of their target environment and the phenomena which may occur within it. 
+
+Typically, the environment data is fed into simulations using recorded sensor data (traces) from an existing deployment or field study\cite{bridge,Gaglione2018}, or is fabricated based on a developer's conceptual model and testing needs. These traces suffer from several issues:
 \begin{itemize}
-  \item static - recorded traces are taken from fixed positions, can be modified but is time consuming and un-reliable.
-  \item reliability - fabricated traces are based on a developers model of an environment and may not accurately represent it or all of it.
-  \item comprehensive - traces are time consuming to create and must be created ahead of time.
-  \item scalability - updating traces when new devices are added or the scenario changes becomes unmanageable for even small networks, <10 devices.
+  \item \textbf{Acquisition} - traces need to be recorded from existing real-world deployments or field studies, the former may not match the target network, and the later can be time-consuming and expensive to perform thoroughly.
+  \item \textbf{Static} - recorded traces are taken from fixed positions, and can't be modified after-the-fact.
+  \item \textbf{Reliability} - fabricated traces are based on a developers model of an environment and may not accurately represent it or all of it.
+  \item \textbf{Comprehensive} - traces are time consuming to create and must be created ahead of time.
+  \item \textbf{Scalability} - updating traces when new devices are added or the scenario changes becomes unmanageable for even small networks, <10 devices.
 \end{itemize}
 
-Gelenbe et al.\cite{6815220}
+For CPS involving human and device mobility, deployment and testbeds are not only time-consuming and expensive to deploy, but also are limited by health and safety, people recruitment, location availability, and scalability. 
+\begin{itemize}
+  \item \textbf{Health and Safety} - Testing involving people needs to ensure strict health and safety guidelines and laws are adhered to, requiring participants to be safeguarded against possible injury and death, thus, testing situations in which poses a threat to participants can't be carried out. 
 
-In the remainder of this chapter we describe the new co-simulation platform, based on the framework described in chapter \ref{chap:framework}, which focuses on enabling CPS simulation within its target environment, utilising a dynamic virtual world. 
+  \item \textbf{Recruitment} - Recruiting participants also makes real-world testing difficult, as tests may require large numbers of people and relatively mundane activities. 
+
+  \item \textbf{Location availability} - Exclusive access to target locations prior to full deployment for testing can be difficult at peak times, requiring out-of-hours testing on weekends or evenings. This can have a knock on impact for recruiting participants.
+
+  \item \textbf{Scalability} - Running tests with extremely large numbers of people at once e.g., >50 for an evacuation, requires significant planning and management. Similarly, running large numbers of tests with even a small number of people may simply not be possible due to time constraints, thus, only a core set of tests may be carried out instead, limiting the scope.
+
+  \item \textbf{Realism} - It's not possible to run tests with real people in real evacuation scenarios, due to health and safety. Instead we can simulate these scenarios in the real-world using fire-drills; however, fire drills by nature have an impact on how people may act during an evacuation. Similarly, people may become familiar with the environment the more tests they perform, which could affect their reaction time and the choices they make. 
+\end{itemize}
+
+
+In the rest of this chapter, we introduce a novel CPS co-simulation platform that has been developed to tackle the issue of simulating a CPS with realistic, dynamic and flexible environment input, described above; the design of the co-simulation platform is based on the framework described in chapter \ref{chap:framework}.
 
 
 % section problem (end)
+\section{A 3D Virtual World Co-Simulation Platform} % (fold)
+\label{sec:a_3d_co_simulation_platform}
+To meet the needs of testing CPS with realistic, dynamic and flexible environment input we designed and built an open co-simulation platform that integrates WSN simulation with a 3D game engine. Using the 3D game engine, we're able to create vivid and realistic models of the real world, involving complex physics, AI pedestrians and crowds, physical destruction, and lighting. 
+
+Using these features, we can:
+\begin{itemize}
+   \item \textbf{Physics} - simulate CPS which involve movement and actuation which are affected by the laws of the physical world, including gravity and friction. 
+   \item \textbf{AI pedestrians and crowds} - simulate human-centric CPS, with pedestrians and crowds exhibiting desired behaviours, such as goal-based movement, avoidance, herding, panic, etc.
+   \item \textbf{Physical Destruction} - simulate destructible environments, which can dynamically react to virtual earth-quakes or other destructive phenomena.
+   \item \textbf{Lighting} - simulate realistic lighting effects, such as shadows, fire and smoke, allowing viewers to understand how it may affect visibility within the real-world. 
+ \end{itemize} 
+% section a_3d_co_simulation_platform (end)
+
 \section{Design}
 \label{sec:Design}
 
