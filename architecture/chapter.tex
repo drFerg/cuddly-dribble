@@ -18,14 +18,13 @@ Existing approaches for testing CPS focus heavily on accurately simulating devic
 \label{ssub:simulation_issues}
 
 % subsubsection simulation_issues (end)
-Typically, the environment data is fed into simulations using recorded sensor data (traces) from an existing deployment or field study\cite{bridge,Gaglione2018}, or is fabricated based on a developer's conceptual model and testing needs. These traces suffer from several issues:
-\begin{itemize}
-  \item \textbf{Acquisition} - traces need to be recorded from existing real-world deployments or field studies, the former may not match the target network, and the later can be time-consuming, expensive, dangerous, or inconvenient to perform thoroughly.
-  \item \textbf{Static} - recorded traces are taken from fixed positions, and can't be modified after-the-fact.
-  \item \textbf{Reliability} - fabricated traces are based on a developers model of an environment and may not accurately represent it or all of it.
-  \item \textbf{Comprehensive} - traces are time consuming to create and must be created ahead of time, thus, limiting the number of traces created.
-  \item \textbf{Scalability} - updating or modifying traces to support new devices being added or when the scenario changes becomes unmanageable for even small networks.
-\end{itemize}
+When testing in simulation, typically the environment data is fed into simulations using recorded sensor data (traces) from an existing deployment, field study\cite{bridge,Gaglione2018}, or is fabricated based on a developer's conceptual model and testing needs. However, using this approach is not without issues.
+
+Acquisition of traces is a difficult and time consuming task, as traces need to be recorded from existing real-world deployments or field studies; the former may not match the target network, and the later can be time-consuming, expensive, dangerous, or inconvenient to perform thoroughly. Once these traces are recorded, they are static and dependent on the fixed position they were recorded from, unable to be modified after-the-fact, e.g., to adjust for moving a sensor in a simulation.
+
+In the case of fabricating traces, these are highly dependent on the desired phenomena a developer is attempting to model and their understanding of it, hence, modelling complex phenomena such as gravity or thermal dynamics by hand is a non-trivial task. Instead developers may choose to imitate certain phenomena with less precision or accuracy, which may result in a disconnect between the test and its performance in the real-world.
+
+Regardless of the method for creating traces, creating comprehensive traces which cover a large number of test scenarios across different scales and layouts of a network is extremely time-consuming and often not feasible, e.g., gathering real traces on a bridge with limited access \cite{Gaglione2018}. Hence, the total coverage of tests for these different variables are reduced.
 
 \subsection{Deployment and Test-bed Issues} % (fold)
 \label{ssub:deployment_and_test_bed_issues}
@@ -33,17 +32,13 @@ Typically, the environment data is fed into simulations using recorded sensor da
 % subsubsection deployment_and_test_bed_issues (end)
 For CPS involving human and device mobility, deployment and test-beds\cite{wisebed1,wisebed2,TempLab,dependibilityTestbedChallenge} are not only time-consuming and expensive to deploy, but also are limited by health and safety, people recruitment, location availability, and scalability issues.
 
-\begin{itemize}
-  \item \textbf{Health and Safety} - Testing involving people needs to ensure strict health and safety guidelines and laws are adhered to, requiring participants to be safeguarded against possible injury and death, thus, testing situations in which poses a threat to participants can't be carried out. 
+Testing involving people needs to ensure strict health and safety guidelines and laws are adhered to, requiring participants to be safeguarded against possible injury and death, thus, testing situations in which poses a threat to participants can't be carried out, e.g., testing crowd based scenarios or scenarios involving hazards such as fire or flooding. Similarly, ethical guidelines must also be followed when involving people, requiring developers to consider guidelines such as VIP ethical guidelines used in human computer interaction (HCI) studies\cite{blandford2008_controlled_experiments,blandford_pretareporter}: Vulnerability, care must be taken when recruiting participants young, elderly, or people with particular conditions; Informed consent, participants must be aware of the experiment and be allowed to withdraw at any time; Privacy and confidentiality must be observed, with participants data anonymised.
 
-  \item \textbf{Recruitment} - Recruiting participants also makes real-world testing difficult, as tests may require large numbers of people and relatively mundane activities. 
+It's not possible to run tests with real people in real evacuation scenarios, due to the health and safety risks mentioned above. Instead we can try to simulate these scenarios in the real-world using fire-drills, a significantly lower risk to participants; however, fire drills by nature have an impact on how people may act during an evacuation. Similarly, people may become familiar with the environment the more tests they perform, which could affect their reaction time and the choices they make. 
 
-  \item \textbf{Location availability} - Exclusive access to target locations prior to full deployment for testing can be difficult at peak times, requiring out-of-hours testing on weekends or evenings. This can have a knock on impact for recruiting participants.
+Recruiting participant also poses a challenge for larger test scenarios, in which recruiting, organising and managing large numbers of participants requires significant planning, approval and management.Similarly, running large numbers of tests with even a small number of people may simply not be possible due to time constraints, thus, only a core set of tests may be carried out instead, limiting the scope.
 
-  \item \textbf{Scalability} - Running tests with extremely large numbers of people at once e.g., >50 for an evacuation, requires significant planning and management. Similarly, running large numbers of tests with even a small number of people may simply not be possible due to time constraints, thus, only a core set of tests may be carried out instead, limiting the scope.
-
-  \item \textbf{Realism} - It's not possible to run tests with real people in real evacuation scenarios, due to health and safety. Instead we can simulate these scenarios in the real-world using fire-drills; however, fire drills by nature have an impact on how people may act during an evacuation. Similarly, people may become familiar with the environment the more tests they perform, which could affect their reaction time and the choices they make. 
-\end{itemize}
+Exclusive access to target locations prior to full deployment for testing can be difficult at peak times, requiring out-of-hours testing on weekends or evenings. This can have a knock on impact for recruiting participants.
 
 
 In the rest of this chapter, we introduce a novel CPS co-simulation platform that has been developed to tackle the issue of simulating a CPS with realistic, dynamic and flexible environment input, described above; the design of the co-simulation platform is based on the framework described in chapter \ref{chap:framework}.
@@ -62,61 +57,61 @@ To meet the needs of testing CPS with realistic, dynamic and flexible environmen
 Using the 3D game engine, we're able to create vivid and realistic models of the real world, involving complex physics, AI pedestrians and crowds, physical destruction, and lighting. In games, films and TV these effects are used purely for creating immersive experiences which can trick the viewer into suspending disbelief; within a simulation these can be instead used effectively to create living simulations grounded in reality. 
 
 Using these features, we can:
-\begin{itemize}
-   \item \textbf{Physics} - simulate CPS which involve movement and actuation which are affected by the laws of the physical world, including gravity, friction and momentum, enabling dynamic and flexible simulations.
-   \item \textbf{AI pedestrians and crowds} - simulate human-centric CPS such as in offices, schools or stadiums, with pedestrians and crowds exhibiting desired behaviours, such as goal-based movement, avoidance, herding, panic, etc.
-   \item \textbf{Physical Destruction} - simulate destructible environments and buildings, which can dynamically react to virtual earthquakes, explosions or other destructive phenomena.
-   \item \textbf{Lighting} - simulate realistic lighting effects, such as shadows, fire and smoke, allowing viewers to understand how lighting and visibility may be affected by different sources of light (sun, lamps, lights, fire) and in different scenarios, day-to-day office, fire evacuation etc. 
- \end{itemize} 
+\begin{description}
+   \item [Physics] - simulate CPS which involve movement and actuation which are affected by the laws of the physical world, including gravity, friction and momentum, enabling dynamic and flexible simulations.
+   \item [AI pedestrians and crowds] - simulate human-centric CPS such as in offices, schools or stadiums, with pedestrians and crowds exhibiting desired behaviours, such as goal-based movement, avoidance, herding, panic, etc.
+   \item [Physical Destruction] - simulate destructible environments and buildings, which can dynamically react to virtual earthquakes, explosions or other destructive phenomena.
+   \item [Lighting] - simulate realistic lighting effects, such as shadows, fire and smoke, allowing viewers to understand how lighting and visibility may be affected by different sources of light (sun, lamps, lights, fire) and in different scenarios, day-to-day office, fire evacuation etc. 
+ \end{description} 
 
 
  Using the input from the 3D game engine to drive the CPS simulation which can then drive change in the virtual world, creates truly dynamic and reactive closed-loop simulations; such a system removes the need for developers to gather, fabricate, modify or update individual sensor traces. This gives developers more time to focus on building better CPS based on their tests, than building the tests.
 
  We believe utilising a 3D game engine to drive the CPS simulation can help resolve the simulation issues described previously, section \ref{ssub:simulation_issues}:
- \begin{itemize}
-  \item \textbf{Acquisition} - developers can model 3D environments which match the design, layout and conditions of their target environment.
-  \item \textbf{Dynamic and Reactive} - new traces are generated in real-time based on the CPS and environment as it changes, be it a new layout or pedestrian behaviour reacting to the CPS or other phenomena.
-  \item \textbf{Reliable} - the game engine simulates a virtual world grounded by realistic physics and lighting. Therefore, relieving the burden on the programmer of creating realistic input models, e.g., calculating when a person will intercept motion sensors as they walk down a corridor. AI people and crowds can be programmed based on desired needs e.g., herding, follow, avoid behaviours.
-  \item \textbf{Comprehensive} - simulations can be carried out faster than real-time, combined with the dynamic physics-based world enables many different scenarios to be tested out in significantly less time.
-  \item \textbf{Scalable} - as new devices are added or existing ones moved, the simulation dynamically adapts and creates a new trace.
-\end{itemize}
+ \begin{description}
+  \item [Acquisition] - developers can model 3D environments which match the design, layout and conditions of their target environment.
+  \item [Dynamic and Reactive] - new traces are generated in real-time based on the CPS and environment as it changes, be it a new layout or pedestrian behaviour reacting to the CPS or other phenomena.
+  \item [Reliable] - the game engine simulates a virtual world grounded by realistic physics and lighting. Therefore, relieving the burden on the programmer of creating realistic input models, e.g., calculating when a person will intercept motion sensors as they walk down a corridor. AI people and crowds can be programmed based on desired needs e.g., herding, follow, avoid behaviours.
+  \item [Comprehensive] - simulations can be carried out faster than real-time, combined with the dynamic physics-based world enables many different scenarios to be tested out in significantly less time.
+  \item [Scalable] - as new devices are added or existing ones moved, the simulation dynamically adapts and creates a new trace.
+\end{description}
 
 Similarly, we believe this co-simulation approach can begin to address the deployment and test-bed issues described in section \ref{ssub:deployment_and_test_bed_issues}.
 
-\begin{itemize}
-  \item \textbf{Health and Safety} - Virtual tests involve virtual people, hence, health and safety rules need not apply. However, one envisions they could apply to some extent if real people are used for virtual reality (VR) tests, but with much less risk attached e.g., real people can't be physically burned by a virtual fire, although they may experience VR sickness.
+\begin{description}
+  \item [Health and Safety] - Virtual tests involve virtual people, hence, health and safety rules need not apply. However, one envisions they could apply to some extent if real people are used for virtual reality (VR) tests, but with much less risk attached e.g., real people can't be physically burned by a virtual fire, although they may experience VR sickness.
 
-  \item \textbf{Recruitment} - Participant recruitment is a non-issue, within a 3D game engine world, 100's of AI participants can be created as and when needed, no bribing necessary.
+  \item [Recruitment] - Participant recruitment is a non-issue, within a 3D game engine world, 100's of AI participants can be created as and when needed, no bribing necessary.
 
-  \item \textbf{Location availability} - Locations can be modelled in the 3D world based off a floor-plan, requiring no access to the real physical location. Alternatively, a one-time measurement plan can be carried out with minimal interference caused.
+  \item [Location availability] - Locations can be modelled in the 3D world based off a floor-plan, requiring no access to the real physical location. Alternatively, a one-time measurement plan can be carried out with minimal interference caused.
 
-  \item \textbf{Scalability} - It is possible to run tests with large numbers of people 24/7, without issue or complaints, scheduling issues or location availability issues.
+  \item [Scalability] - It is possible to run tests with large numbers of people 24/7, without issue or complaints, scheduling issues or location availability issues.
 
-  \item \textbf{Realism} - AI people and crowds can mimic required behaviour, enabling perhaps more consistent simulations when compared to real people in fake or ``drill'' scenarios, e.g., virtual people can be told to panic or mimic herding behaviour, whereas real people may not exhibit this behaviour in non-life-threatening scenarios. This enables developers to test for these different behaviours and scenarios which affect them. However, the AI behaviour may not reflect the true unique and complex reactions of a real person and crowd in real scenarios.
-\end{itemize}
+  \item [Realism] - AI people and crowds can mimic required behaviour, enabling perhaps more consistent simulations when compared to real people in fake or ``drill'' scenarios, e.g., virtual people can be told to panic or mimic herding behaviour, whereas real people may not exhibit this behaviour in non-life-threatening scenarios. This enables developers to test for these different behaviours and scenarios which affect them. However, the AI behaviour may not reflect the true unique and complex reactions of a real person and crowd in real scenarios.
+\end{description}
 
 \subsection{The WSN/CPS Simulator Component} % (fold)
 \label{sub:a_wsn_cps_simulator}
 Like previous physical simulator approaches \cite{6815220}, we could use a standard programming language and environment to program and model the WSN component, such as the language used within the game engine, C++. However, this approach has several limitations:
-\begin{itemize}
-  \item \textbf{Portability} - programming in a non-WSN/CPS language and environment requires porting to the desired platform when deploying. This can vary in difficulty depending on the differences in language, environment and programming paradigm/model e.g., event-based or imperative.
-  \item \textbf{Accuracy} - many issues in WSN/CPS depend on the performance constraints of the deployment devices which have severely limited CPU, RAM, ROM and battery hardware.
-  \item \textbf{Radio Network} - WSN/CPS rely on their radio network for communicating between nodes within a network, which also has a significant impact on other aspects of the device, such as performance, duty cycle and battery life.
-\end{itemize}
+\begin{description}
+  \item [Portability] - programming in a non-WSN/CPS language and environment requires porting to the desired platform when deploying. This can vary in difficulty depending on the differences in language, environment and programming paradigm/model e.g., event-based or imperative.
+  \item [Accuracy] - many issues in WSN/CPS depend on the performance constraints of the deployment devices which have severely limited CPU, RAM, ROM and battery hardware.
+  \item [Radio Network] - WSN/CPS rely on their radio network for communicating between nodes within a network, which also has a significant impact on other aspects of the device, such as performance, duty cycle and battery life.
+\end{description}
 
 Utilising the Cooja WSN simulator enables the co-simulation platform to build upon the tool to create a powerful testing platform which developers can test on before seamlessly deploying to real devices in their target environment.
 
-\begin{itemize}
-  \item \textbf{Portable} - Cooja nodes are programmed in the Contiki C language, hence, the same code can be deployed for simulated nodes as for deployed nodes. This removes the issues related to translating between simulated and real nodes.
-  \item \textbf{Accurate} - Cooja nodes can be simulated at various accuracy levels, using the same code, dependent on the level needed and the available computing power of the host simulation PC.
-  \item \textbf{Radio Simulation} - Cooja provides various radio simulation models, enabling developers to test complex radio scenarios, with varying RSSI and interference models. 
-\end{itemize}
+\begin{description}
+  \item [Portable] - Cooja nodes are programmed in the Contiki C language, hence, the same code can be deployed for simulated nodes as for deployed nodes. This removes the issues related to translating between simulated and real nodes.
+  \item [Accurate] - Cooja nodes can be simulated at various accuracy levels, using the same code, dependent on the level needed and the available computing power of the host simulation PC.
+  \item [Radio Simulation] - Cooja provides various radio simulation models, enabling developers to test complex radio scenarios, with varying RSSI and interference models. 
+\end{description}
 % subsection a_wsn_cps_simulator (end)
 % section a_3d_co_simulation_platform (end)
 
 \section{Co-Simulator Design}
 \label{sec:Design}
-Discussed in chapter \ref{chap:framework}, the co-simulation platform is designed in an open, component agnostic fashion, i.e., the platform encourages the interoperability of different simulation platforms, specifying clear abstractions and boundaries between components. The goal is to create a plug-n-play platform that can support the use of different simulation, analytical and game engine tools, with our implementation providing an example construction.
+Discussed in chapter \ref{chap:framework}, the co-simulation platform is designed in an open, component agnostic fashion, i.e., the platform encourages the interoperability of different simulation platforms, specifying clear abstractions and boundaries between components and uses a publish / subscribe bus to communicate. The goal is to create a plug-n-play platform that can support the use of different simulation, analytical and game engine tools, with our implementation providing an example construction.
 
 \subsection{WSN Simulator Component} % (fold)
 \label{sub:wsn_simulator_component}
@@ -127,26 +122,32 @@ Users select the hardware they wish to deploy there application code, software, 
 \subsubsection{Radio} % (fold)
 \label{ssub:radio}
 
-Radio simulation is performed entirely within Cooja, relying on the built-in radio models and distance between nodes to determine node RSSI and packet-loss. \textbf{Utilising the game engine's knowledge of the 3D world and obstructions between nodes could improve the accuracy of the radio simulation, however, this remains as future work. Kokkinis et al.\cite{trunetWireless} have demonstrated the use of 3D models of target environments to simulate an accurate radio model based on obstructions and their material types.}
+Radio simulation is performed entirely within Cooja, relying on the built-in radio models and distance between nodes to determine node RSSI and packet-loss. However, to enable dynamic and mobile nodes, Cooja subscribes to node location updates; when a nodes position is updated by other components, such as by being moved in the virtual world, the radio model is updated any any subsequent radio activity is affected by this.
+
+To provide other components with information about the radio environment, including transmissions and successful or interfered receives, the radio component publishes all radio state to the radio topic. 
+
+\textbf{Utilising the game engine's knowledge of the 3D world and obstructions between nodes could improve the fidelity of the radio simulation, however, this remains as future work. Kokkinis et al.\cite{trunetWireless} have demonstrated the use of 3D models of target environments to simulate an accurate radio model based on obstructions and their material types. Once the 3D model is built within the game engine component, the model can be exported to the TruNet tool to calculate the radio model and then import back into Cooja providing an accurate radio model based on the virtual environment.}
 
 
 % subsubsection radio (end)
 \subsubsection{Location} % (fold)
 \label{ssub:location}
 
-Each node is configured with an initial 3D location, used in the radio simulation to calculate radio interference. The location is exposed to other co-simulation components via pub/sub topics which Cooja is subscribed to, so can be updated at any time by other co-simulation components (game engine), creating dynamic mobile nodes which can then affect Cooja's radio simulation.
+Each node is configured with an initial 3D location, used in the radio simulation to calculate radio interference. The location is exposed to other co-simulation components via pub/sub topics which Cooja is subscribed to, so can be updated at any time by other co-simulation components (game engine). This enables developers to test scenarios with dynamic mobile nodes which as the nodes move affect the radio simulation within Cooja.
+
+It is also possible for nodes with inertial measurement units (IMU) to receive updates, to inform applications of any 3D movement, discussed further in the following section.
 % subsubsection location (end)
 
-\subsubsection{Hardware Interfaces - Sensors} % (fold)
+\subsubsection{Hardware Interfaces - Sensors and Actuators} % (fold)
 \label{ssub:hardware_interfaces_sensors}
 
-Hardware interfaces which normally interact with the physical world, such as motion/acceleration/light sensors or buttons, are exposed as virtual hardware interfaces to other co-simulation components via pub/sub topics.
+Hardware interfaces which normally interact with the physical world, such as motion, acceleration, light sensors and buttons, are exposed as virtual hardware interfaces to other co-simulation components via pub/sub topics.
 
-\missingfigure{Will show how - Node hardware interfaces connect to other components via a publish/subscribe bus.}
+\missingfigure[figheight=7cm]{Will show how - Node hardware interfaces connect to other components via a publish/subscribe bus.}
 
-Data related to input interfaces can be published to by co-simulation components, to which Cooja subscribes and distributes to the relevant nodes, such that when a node queries a sensor, the most up-to-date reading is available. This also ensures response time for hardware interface requests is kept to the absolute minimal.
+Data related to input interfaces can be published to by co-simulation components, to which Cooja subscribes and distributes to the relevant nodes, such that when a node queries an on-board sensor, the most up-to-date reading is available, from within the component. This also ensures response time for hardware interface requests is kept to the absolute minimal, requiring no cross-component calls (i.e., network calls) to retrieve data. However, this method could result in applications reading delayed, stale data, by approximately the RTT/2 between publisher and subscriber; in applications where sensor data is high frequency and ephemeral, this approach induce a time-delay effect when comparing simulated vs real-world tests. This delay will be explored in the evaluation, section \ref{sec:architecture_evaluation}. 
 
-Similarly, data related to output interfaces, such as LEDs or actuators, is published by Cooja to the relevant per-interface topics; allowing subscribed components to be updated in real-time of hardware events, which can then be actioned in a virtual world component, recorded by a logging or analytical component.
+Similarly, data related to output interfaces, such as LEDs or actuators, is published by Cooja to the relevant per-interface topics; allowing subscribed components to be updated in real-time of such hardware events, which can then be: actioned in a virtual world component, such as turning on a light, opening a door or activating an alarm; or recorded by a logging or analytical component for further analysis.
 
 
 % subsubsection hardware_interfaces_sensors (end)
@@ -154,20 +155,58 @@ Similarly, data related to output interfaces, such as LEDs or actuators, is publ
 
 \subsection{3D Game Engine Component} % (fold)
 \label{sub:3d_game_engine_component}
-The 3D game engine component, Unreal Engine 4, is responsible for simulating the 3D virtual world and the physics, lighting and people within it. It also models the physical manifestation of the nodes and their exposed hardware interfaces, such as sensors and lights.
+The 3D game engine component, Unreal Engine 4, is responsible for simulating the 3D virtual world and the physics, lighting and people within it. It also models the physical manifestation of the nodes and their exposed hardware interfaces i.e., sensors and actuators.
 
-\subsubsection{Virtual Node Hardware} % (fold)
+\subsubsection{Virtual Node Model} % (fold)
 \label{ssub:virtual_node_hardware}
-Within the virtual world we can choose to model node hardware to an accurate scale, or not. This allows for developers to choose physical accuracy when required for scenarios which may involve mobile nodes which can be affected by physics and collisions with the environment. On the other hand, increasing a nodes scale can help locatability of a node and visibility of any information on the device, such as LEDs or an ID.
+Within the virtual world we can choose to model node hardware to an accurate scale, or not. This allows for developers to choose physical accuracy when required for scenarios which may involve mobile nodes that can be affected by physics and collisions with the environment. On the other hand, we can sacrifice realism by increasing a nodes scale; this can help the visual locatability of a node and visibility of any information on the device, such as LEDs or an ID.
 
-\begin{figure}[h]
+Figure \ref{fig:sensor_scales} shows three different scales of the basic sensor node model we designed. The model is designed as a simple cuboid with large LED lights on the top of the device, matching those typically found on a sensor node (TelosB Mote).
+\begin{figure}[tbh]
    \centering
    \includegraphics[width=\textwidth]{img/sensorScales.png}
    \caption{Variable sensor scales, providing either physically accurate sized devices or more visible devices}
    \label{fig:sensor_scales}
  \end{figure} 
+
+Within the virtual world, nodes can be set to either: static, its location is fixed and is not affected by physics; moveable, it can be acted upon by the physics engine e.g., fall due to gravity, react from a collision; or attached to another entity, such as a person or vehicle, moving as they move. This enables nodes to be dynamic mobile nodes reacting to the virtual environment.
+
 % subsubsection virtual_node_hardware (end)
-Within the game engine we can model the target 3D environment and created a several components to support deploying virtual sensor networks, including device and sensor 3D models, hardware abstractions for the virtual sensors and actuators to sense the virtual world and report back to the simulator over the network bus. Similarly within the Cooja simulator we have modified the simulated hardware to communicate to our virtual hardware in the Unreal Engine.
+
+\subsubsection{Virtual Hardware Interface} % (fold)
+\label{ssub:virtual_hardware_interface}
+A node's representation within the game engine can sense and actuate within the virtual world via their virtual hardware interfaces. A node can be assigned multiple interfaces, each of which can publish or subscribe to updates on the relevant pub/sub topics with their associated node's ID. 
+
+In the virtual world these hardware interfaces can programmatically sense the virtual world using primitives available within the game engine, such as trigger boxes, collisions and ray casts. Using these game engine primitives, developers can model a variety of sensors to desired varying degrees of accuracy; this gives developers the power to experiment with different sensor types, accuracies and capabilities, which may not be available to them or exist. Sensors are then assigned to a node's sensing port.\sidenote{Refer to game engine background for more info on these meaning?} 
+
+For performing actuation, a virtual actuation object, such as a light, alarm or door, is assigned to a node's actuation port. By default a node exposes 3 standard actuation ports, one for each LED built into a typical node. To perform actuation, another component simply publishes to the relevant actuator topic, which the targeted node then receives and performs the actuation in the virtual world.
+
+\begin{figure}[tbh]
+  \centering
+  \includegraphics[width=\textwidth]{img/motionSensor.png}
+  \caption{Motion sensors with their field-of-view visible.}
+  \label{fig:motionSensor}
+\end{figure}
+
+Within the co-simulation platform we consider the following initial sensor and actuator types:
+\begin{description}[topsep=0pt]
+  \item [Button] - A physical button sensor can be directly interacted with by people, both AI and controlled, when in range. When pressed an event is triggered in the game engine.
+    \begin{description}[topsep=0pt]
+      \item[Type:] Triggered by an event. 
+    \end{description}
+  \item [Distance] - A distance sensor uses a single ray-cast to measure the straight-line distance from a point until the first object it hits. The distance sensor runs at a specified frequency, e.g., 20Hz.
+  \item [Trip] - A trip sensor uses trigger box, several pixels wide and the length of the space, which upon an object crossing into it triggers an event within the game engine.
+  \item [Motion] - Similar to a trip sensor, a motion sensor uses a trigger box in the shape of the motion sensor field-of-view, e.g., conical. When a human passes into, through, or out of it, it triggers an event. The range and sensitivity of the trigger box can be adjusted by developers. Also the class of detection can be changed from human to all objects, depending on the type of motion sensor being mimicked, PIR or ultrasonic respectively.
+  \item [Presence] - A presence sensor can be thought of as an ultra sensitive human motion detector (detecting even still people) which can also detect the identity of the detected people. Similar to the motion sensor, human entities can be detected and also identified by programmatically reading the identity of any people within the range of the sensor. 
+  \item [IMU] - Each node within the game engine knows its own 3D location, rotation and acceleration information, updated at each game tick. Using this information a node can simulate an inertial measurement unit sensor.
+  \item [Temperature] - Unlike other sensors, the temperature sensor has no native primitive within the virtual world, as video games rarely model temperature. As a primitive temperature could be modelled within a building by dividing the area into cuboids, matching the size of a room. As the temperature increases within a room, a connected space's temperature will also be influenced, at a speed dependent on the size of the difference.
+  \item [Light] - A light actuator is connected to a light source in the virtual world, this could be a room light, spot light or lamp. The light source can be either a binary light or dimmable.
+  \item [Sound] - An sound actuator is connected to a sound source in the virtual world, such as an alarm or beep. When triggered the sound is played continuously until turned off. 
+ \end{description} 
+
+Independent of the sensor type, either polling or event-based, data is published to the relevant sensor topic with the associated node ID, enabling other components to subscribe to these sensor updates. Whilst the event-based sensors only transmit sensor data upon being triggered by an event, such as a collision, or interaction, the polling sensors send sensor data updates at a fixed rate.
+% subsubsection virtual_hardware_interface (end)
+
 \subsubsection{Virtual Environment} % (fold)
 \label{ssub:virtual_environment}
 
@@ -175,9 +214,17 @@ Within the game engine we can model the target 3D environment and created a seve
 
 \subsubsection{AI People and Crowds} % (fold)
 \label{ssub:ai_people_and_crowds}
+Using the game engine's built in tools, developers are able to place AI people into the world and construct behaviours for them to carry out. For our indoor example we created several basic behaviours, including:
 
+\begin{description}
+  \item[Move to location] One or all people move to a specified location by the shortest route.
+  \item[Roam] All people roam between rooms and the corridor, simulating basic movement within an office.
+  \item[Evacuate] All people attempt to leave the building via the closest exit.
+  \item[Avoid] People will attempt to avoid an individual or object, changing their path or moving out of the way as it approaches.
+  \item[Follow/Herd] People will ignore their previous behaviour and follow an individual.
+\end{description}
 % subsubsection ai_people_and_crowds (end)
-Using Cooja, developers are able to write code once and both test in Ard\'{a}n and deploy in the real-world on the Contiki or TinyOS platform, removing difficulties associated with translating between test and deployment platforms. Using the open architecture, support for additional tools and simulation platforms can also be added, expanding the possibilities and improving the fidelity of simulations.
+
 
 % subsection 3d_game_engine_component (end)
 \section{Phenomena-on-demand} % (fold)
